@@ -335,11 +335,9 @@ expect {
         exp_continue
     }
     "Choose your region" {
-        # Navigate to Frankfurt (fra1) - 4 down from iad1
+        # Type desired region so CLI filters automatically
         sleep 0.5
-        send "\033\[B\033\[B\033\[B\033\[B"
-        sleep 0.5
-        send "\r"
+        send "fra1\r"
         exp_continue
     }
     -re "NEXT_PUBLIC_.*\\(" {
@@ -348,11 +346,9 @@ expect {
         exp_continue
     }
     "Choose a billing plan" {
-        # Navigate to Free plan (2 down from Pro Plan)
+        # Type plan name directly to select Free tier
         sleep 0.5
-        send "\033\[B\033\[B"
-        sleep 0.5
-        send "\r"
+        send "Supabase Free Plan\r"
         exp_continue
     }
     "Confirm selection?" {
