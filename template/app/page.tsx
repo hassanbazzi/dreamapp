@@ -1,156 +1,116 @@
 "use client"
 
+import Link from "next/link"
+
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-8 bg-gradient-to-b from-background to-muted/20">
-      <div className="max-w-3xl w-full space-y-12">
-        <div className="text-center space-y-4">
-          <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
-            ✨ Welcome to{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Dream App
-            </span>
-            !
+    <div className="flex min-h-screen flex-col">
+      {/* Hero Section - Simple and action-focused */}
+      <section className="flex flex-1 flex-col items-center justify-center px-6 py-16 text-center">
+        <div className="mx-auto max-w-5xl space-y-8">
+          {/* Main Heading */}
+          <h1 className="text-5xl font-medium leading-[1.08] tracking-tight sm:text-6xl lg:text-7xl">
+            Build Anything.
           </h1>
-          <p className="text-xl text-muted-foreground">
-            You're all set up! Your app is ready to build.
+
+          {/* Subtitle */}
+          <p className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground">
+            Describe your idea and watch it come to life. No code needed.
           </p>
-        </div>
 
-        <div className="space-y-8 bg-card border rounded-lg p-8 shadow-sm">
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">
-              Get Started (Two Quick Steps!)
-            </h2>
-
-            <div className="space-y-6">
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm">
+          {/* Simple instruction */}
+          <div className="mx-auto max-w-2xl space-y-4 rounded-2xl border border-border bg-muted/20 p-8">
+            <div className="space-y-3">
+              <p className="text-base font-medium">To get started:</p>
+              <ol className="space-y-3 text-left text-sm text-muted-foreground">
+                <li className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background text-sm font-medium">
                     1
                   </span>
-                  Press{" "}
-                  <code className="px-2 py-1 bg-muted rounded text-sm">
-                    Cmd + L
-                  </code>
-                </h3>
-                <p className="text-muted-foreground ml-8">
-                  (or{" "}
-                  <code className="px-2 py-1 bg-muted rounded text-sm">
-                    Ctrl + L
-                  </code>{" "}
-                  on Windows)
-                </p>
-                <p className="text-muted-foreground ml-8">
-                  This opens your AI assistant.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-sm">
+                  <span>
+                    Type{" "}
+                    <span className="font-mono text-sm bg-background px-2 py-1 rounded border border-border">
+                      /brainstorm
+                    </span>{" "}
+                    in the chat
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background text-sm font-medium">
                     2
                   </span>
-                  Say this:
-                </h3>
-                <div className="ml-8 space-y-2">
-                  <div className="bg-muted p-3 rounded-md font-mono text-sm">
-                    Let's get started!
-                  </div>
-                  <p className="text-muted-foreground text-center">or</p>
-                  <div className="bg-muted p-3 rounded-md font-mono text-sm">
-                    I want to build [describe your idea]
-                  </div>
+                  <span>Describe your idea in plain English</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-background text-sm font-medium">
+                    3
+                  </span>
+                  <span>The AI will help you refine it and build it</span>
+                </li>
+              </ol>
+            </div>
+          </div>
+
+          {/* Quick examples */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-muted-foreground">
+              Example ideas:
+            </p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {[
+                "A recipe sharing app",
+                "Personal blog",
+                "Task manager",
+                "Photo gallery",
+                "Online store",
+                "Booking system",
+              ].map((example) => (
+                <div
+                  key={example}
+                  className="rounded-full border border-border bg-background px-3 py-1.5 text-xs text-muted-foreground"
+                >
+                  {example}
                 </div>
-              </div>
+              ))}
             </div>
-
-            <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900 rounded-lg">
-              <p className="text-sm">
-                <strong>That's it!</strong> Your assistant can see your app in
-                the browser and will help you build whatever you want.
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                💡 <strong>Pro tip:</strong> Your dev server is already running
-                and visible in the browser tab! Look at the bottom panel to see
-                the server logs.
-              </p>
-            </div>
-          </div>
-
-          <hr className="border-border" />
-
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">What You Can Build</h2>
-            <p className="text-muted-foreground mb-4">
-              Just describe what you want in plain English:
-            </p>
-            <div className="space-y-2">
-              <div className="p-3 bg-muted rounded-md text-sm">
-                "Add a page where users can create notes"
-              </div>
-              <div className="p-3 bg-muted rounded-md text-sm">
-                "Make the homepage more colorful"
-              </div>
-              <div className="p-3 bg-muted rounded-md text-sm">
-                "Add a profile page with user settings"
-              </div>
-              <div className="p-3 bg-muted rounded-md text-sm">
-                "Create a todo list"
-              </div>
-              <div className="p-3 bg-muted rounded-md text-sm">
-                "Add dark mode"
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground mt-4">
-              Your assistant will build it, test it, and show you it working.
-            </p>
-          </div>
-
-          <hr className="border-border" />
-
-          <div>
-            <h2 className="text-2xl font-semibold mb-4">Need Help?</h2>
-            <p className="text-muted-foreground mb-4">
-              Just ask your assistant:
-            </p>
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-start gap-2">
-                <span className="text-primary">•</span>
-                <span>"What can I build?"</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">•</span>
-                <span>"Show me some examples"</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary">•</span>
-                <span>"I have an idea but not sure how to describe it"</span>
-              </li>
-            </ul>
           </div>
         </div>
+      </section>
 
-        <div className="text-center space-y-4">
-          <p className="text-2xl font-semibold">
-            Ready? Press{" "}
-            <code className="px-2 py-1 bg-muted rounded text-sm">Cmd + L</code>{" "}
-            and say "Get started" 🚀
-          </p>
+      {/* Footer */}
+      <footer className="border-t border-border py-12 px-6 text-center">
+        <div className="container mx-auto space-y-4">
+          <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
+            <Link
+              href="/about"
+              className="hover:text-foreground transition-colors"
+            >
+              About
+            </Link>
+            <Link
+              href="/dashboard"
+              className="hover:text-foreground transition-colors"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/login"
+              className="hover:text-foreground transition-colors"
+            >
+              Sign In
+            </Link>
+          </div>
           <p className="text-sm text-muted-foreground">
-            From{" "}
-            <a
+            Built with Dream App •{" "}
+            <Link
               href="https://getdreamapp.com"
-              className="text-primary hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
+              className="font-medium underline underline-offset-4 hover:text-foreground"
             >
               getdreamapp.com
-            </a>{" "}
-            with ❤️
+            </Link>
           </p>
         </div>
-      </div>
+      </footer>
     </div>
   )
 }
