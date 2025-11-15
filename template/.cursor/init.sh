@@ -1,23 +1,29 @@
 #!/bin/bash
 
-# Wait for Cursor to fully load
+# Wait for Cursor to fully load and WELCOME.md to open
 sleep 3
 
-# Open browser using AppleScript to trigger Cmd+Shift+P and run command
+# Run Cursor commands using AppleScript
 osascript <<EOF
 tell application "System Events"
-    # Wait a moment for Cursor to be ready
+    # Wait for Cursor to be ready
     delay 2
     
-    # Open command palette (Cmd+Shift+P)
+    # Open markdown preview (Cmd+Shift+P)
     keystroke "p" using {command down, shift down}
     delay 0.5
-    
-    # Type "Open Browser" command
-    keystroke "Cursor: Open Browser"
-    delay 0.3
+    keystroke "markdown show preview"
+    delay 0.5
     keystroke return
     delay 1
+    
+    # Open browser tab (Cmd+Shift+P)
+    keystroke "p" using {command down, shift down}
+    delay 0.5
+    keystroke "open browser tab"
+    delay 0.5
+    keystroke return
+    delay 2
     
     # Open Composer (Cmd+L)
     keystroke "l" using {command down}
