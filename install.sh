@@ -348,6 +348,10 @@ expect {
         exp_continue
     }
     "Choose a billing plan" {
+        # Navigate to Free plan (top of list)
+        sleep 0.5
+        send "\033\[A\033\[A\033\[A\033\[A\033\[A"
+        sleep 0.5
         send "\r"
         exp_continue
     }
@@ -360,7 +364,16 @@ expect {
         exp_continue
     }
     "Select environments" {
-        send " \r"
+        # Select all environments: space on each option
+        send " "
+        sleep 0.2
+        send "\033\[B"
+        send " "
+        sleep 0.2
+        send "\033\[B"
+        send " "
+        sleep 0.2
+        send "\r"
         exp_continue
     }
     eof
