@@ -330,41 +330,55 @@ set send_human {.1 .3 1 .05 2}
 spawn vercel integration add supabase
 
 expect {
-    -re "\\? What is the name of the resource\\?" {
+    -re {What is the name of the resource} {
         send "$env(APP_SLUG)\r"
-        exp_continue
-    }
-    -re "\\? Choose your region" {
-        # Type desired region so CLI filters automatically
-        sleep 0.5
-        send -- "fra1"
-        sleep 0.3
+        # Wait for region prompt
+        expect -re {Choose your region}
+        # Wait for menu to fully render
+        expect -re {iad1}
+        # Type "fra" to filter to Frankfurt
+        send "f"
+        send "r"
+        send "a"
+        # Wait for fra1 to be SELECTED
+        expect -re {❯.*fra1|fra1.*❯}
+        send "\r"
+        # Now handle NEXT_PUBLIC prefix prompt
+        expect -re {NEXT_PUBLIC}
         send "\r"
         exp_continue
     }
-    -re "\\? NEXT_PUBLIC_" {
-        # Just press Enter to accept default prefix
+    -re {Choose a billing plan} {
+        # Wait for menu to render
+        expect -re {Pro Plan}
+        # Type "Supabase Free Plan" (case-sensitive)
+        send "S"
+        send "u"
+        send "p"
+        send "a"
+        send "b"
+        send "a"
+        send "s"
+        send "e"
+        send " "
+        send "F"
+        send "r"
+        send "e"
+        send "e"
+        # Wait for Supabase Free Plan to be selected
+        expect -re {❯.*Supabase Free Plan|Supabase Free Plan.*❯}
         send "\r"
         exp_continue
     }
-    -re "\\? Choose a billing plan" {
-        # Type plan name directly to select Free tier
-        sleep 0.5
-        send -- "Supabase Free Plan"
-        sleep 0.3
-        send "\r"
-        exp_continue
-    }
-    -re "\\? Confirm selection" {
+    -re {.*Confirm selection.*} {
         send "y\r"
         exp_continue
     }
-    -re "\\? Do you want to link this resource to the current project" {
+    -re {.*link this resource to the current project.*} {
         send "y\r"
         exp_continue
     }
-    -re "\\? Select environments" {
-        # All environments already selected by default, just press Enter
+    -re {.*Select environments.*} {
         send "\r"
         exp_continue
     }
