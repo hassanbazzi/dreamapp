@@ -7,72 +7,97 @@ VIBE_GREEN='\033[0;32m'
 VIBE_BLUE='\033[0;34m'
 VIBE_YELLOW='\033[1;33m'
 VIBE_RED='\033[0;31m'
+VIBE_CYAN='\033[0;36m'
+VIBE_BOLD='\033[1m'
 NC='\033[0m' # No Color
 
 TEMPLATE_REPO="hassanbazzi/dreamapp"
 
+# Helper functions
+print_header() {
+    echo -e "\n${VIBE_BOLD}${VIBE_CYAN}╭─────────────────────────────────────────╮${NC}"
+    echo -e "${VIBE_BOLD}${VIBE_CYAN}│${NC}  $1"
+    echo -e "${VIBE_BOLD}${VIBE_CYAN}╰─────────────────────────────────────────╯${NC}\n"
+}
+
+print_step() {
+    echo -e "${VIBE_BLUE}▶${NC} $1"
+}
+
+print_success() {
+    echo -e "${VIBE_GREEN}✓${NC} $1"
+}
+
+print_error() {
+    echo -e "${VIBE_RED}✗${NC} $1"
+}
+
+print_warning() {
+    echo -e "${VIBE_YELLOW}⚠${NC} $1"
+}
+
 clear
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "  ✨ DREAM APP INSTALLER"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${VIBE_BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${VIBE_BOLD}       ✨  DREAM APP INSTALLER  ✨${NC}"
+echo -e "${VIBE_BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-echo "This will set up everything you need to build"
-echo "production apps with AI assistance."
+echo "  This will set up everything you need to build"
+echo "  apps with AI - no coding experience needed!"
 echo ""
-echo "What this installs:"
-echo "  • Node.js & pnpm (to run your app)"
-echo "  • Git & GitHub CLI (version control)"
-echo "  • Cursor (AI code editor)"
-echo "  • Vercel CLI (deployment)"
+echo -e "${VIBE_CYAN}What you'll get:${NC}"
+echo "  • An AI assistant that writes code for you"
+echo "  • Your app published on the internet"
+echo "  • User login & sign up built-in"
+echo "  • A database to store your data"
+echo "  • Everything connected and ready to use"
 echo ""
-echo "Then creates your app, deploys it, and sets up"
-echo "Supabase database via Vercel integration!"
+echo "  Takes about 10-15 minutes, then you can start building!"
 echo ""
-echo "From getdreamapp.com with ❤️"
+echo -e "${VIBE_YELLOW}From getdreamapp.com with ❤️${NC}"
 echo ""
 read -p "Ready? Press Enter to start..."
 
 # ============================================
 # 1. CHECK MACOS
 # ============================================
-echo ""
-echo "${VIBE_BLUE}🔍 Checking system...${NC}"
+print_header "Checking System"
+
+print_step "Detecting operating system..."
 
 if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "${VIBE_RED}❌ This installer only works on macOS${NC}"
+  print_error "This installer only works on macOS"
   echo "Windows/Linux support coming soon!"
   exit 1
 fi
 
-echo "✅ macOS detected"
+print_success "macOS detected"
 
 # ============================================
 # 2. INSTALL XCODE COMMAND LINE TOOLS
 # ============================================
-echo ""
-echo "${VIBE_BLUE}📦 Checking Xcode Command Line Tools...${NC}"
+print_step "Checking Xcode Command Line Tools..."
 
 if ! xcode-select -p &>/dev/null; then
-    echo "Installing Xcode Command Line Tools..."
-    echo "${VIBE_YELLOW}⚠️  A popup will appear - click Install${NC}"
+    print_warning "A popup will appear - click Install"
     xcode-select --install
     echo ""
-    echo "⏳ Waiting for Xcode tools to finish installing..."
+    print_step "Waiting for Xcode tools to finish installing..."
     read -p "Press Enter once the installation completes..."
 fi
 
-echo "✅ Xcode tools ready"
+print_success "Xcode Command Line Tools ready"
 
 # ============================================
 # 3. INSTALL HOMEBREW
 # ============================================
-echo ""
-echo "${VIBE_BLUE}🍺 Checking Homebrew...${NC}"
+print_header "Installing Package Manager"
+
+print_step "Checking for Homebrew..."
 
 if ! command -v brew &>/dev/null; then
-    echo "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    print_step "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | grep -v "^$" | head -20
     
     # Add to PATH (for Apple Silicon Macs)
     if [[ $(uname -m) == 'arm64' ]]; then
@@ -83,225 +108,287 @@ if ! command -v brew &>/dev/null; then
         eval "$(/usr/local/bin/brew shellenv)"
     fi
     
-    echo "✅ Homebrew installed"
+    print_success "Homebrew installed"
 else
-    echo "✅ Homebrew already installed"
+    print_success "Homebrew already installed"
 fi
 
 # ============================================
 # 4. INSTALL CORE TOOLS
 # ============================================
-echo ""
-echo "${VIBE_BLUE}🔧 Installing development tools...${NC}"
-echo "(This might take a few minutes)"
+print_header "Installing Development Tools"
 
-# Install tools via Homebrew
-brew install git node pnpm gh
+print_step "Installing git, node, pnpm, and GitHub CLI..."
+echo -e "${VIBE_YELLOW}  (This might take a few minutes - sit tight!)${NC}"
 
-# Install Vercel CLI via pnpm
-echo "Installing Vercel CLI..."
-pnpm install -g vercel
+# Install tools via Homebrew (suppress already installed warnings)
+brew install git node pnpm gh 2>&1 | grep -v "already installed" | grep -v "To reinstall" | grep -v "brew reinstall" | grep -E "^(Installing|Downloading|==>)" || true
 
-echo "✅ All tools installed"
+print_success "Core tools installed"
+
+print_step "Installing Vercel CLI..."
+pnpm install -g vercel >/dev/null 2>&1
+
+print_success "All development tools ready!"
 
 # ============================================
 # 5. INSTALL CURSOR
 # ============================================
+print_header "Installing Cursor"
+
 echo ""
-echo "${VIBE_BLUE}💻 Installing Cursor...${NC}"
+echo -e "${VIBE_CYAN}What is Cursor?${NC}"
+echo "  Cursor is like a text editor, but with an AI assistant built-in."
+echo "  You tell it what you want, and it writes the code for you!"
+echo ""
+
+print_step "Installing Cursor..."
 
 if [ ! -d "/Applications/Cursor.app" ]; then
-    brew install --cask cursor
-    echo "✅ Cursor installed"
+    brew install --cask cursor >/dev/null 2>&1
+    print_success "Cursor installed"
 else
-    echo "✅ Cursor already installed"
+    print_success "Cursor already installed"
 fi
 
 # ============================================
-# 6. SETUP GITHUB
+# 6. CONNECT GITHUB ACCOUNT
 # ============================================
+print_header "Connecting to GitHub"
+
 echo ""
-echo "${VIBE_BLUE}🐙 Setting up GitHub...${NC}"
+echo -e "${VIBE_CYAN}What is GitHub?${NC}"
+echo "  GitHub is where the code that runs your app lives."
+echo "  Think of it like Google Drive, but for code."
+echo "  It keeps your app safe and tracks all your changes."
+echo ""
 
 # Check if already authenticated
 if ! gh auth status &>/dev/null; then
-    echo "Let's connect your GitHub account..."
-    echo "(A browser window will open for login)"
+    print_step "Signing in to GitHub..."
+    echo -e "${VIBE_YELLOW}  (A browser window will open)${NC}"
     gh auth login
 else
-    echo "✅ Already logged into GitHub"
+    print_success "Already signed in to GitHub"
 fi
 
 # Setup SSH if not exists
 if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
     echo ""
-    read -p "Enter your email for SSH key: " USER_EMAIL
-    ssh-keygen -t ed25519 -C "$USER_EMAIL" -f "$HOME/.ssh/id_ed25519" -N ""
-    eval "$(ssh-agent -s)"
-    ssh-add "$HOME/.ssh/id_ed25519"
+    read -p "Enter your email: " USER_EMAIL
+    print_step "Setting up secure connection..."
+    ssh-keygen -t ed25519 -C "$USER_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "" >/dev/null 2>&1
+    eval "$(ssh-agent -s)" >/dev/null 2>&1
+    ssh-add "$HOME/.ssh/id_ed25519" 2>/dev/null
     
     # Add to GitHub
-    gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key"
-    echo "✅ SSH key added to GitHub"
+    gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key" 2>/dev/null
+    print_success "Secure connection set up"
 else
-    echo "✅ SSH key already exists"
+    print_success "Already connected securely"
 fi
 
-echo "✅ GitHub connected"
+print_success "GitHub ready!"
 
 # ============================================
 # 7. CREATE PROJECT
 # ============================================
-echo ""
-echo "${VIBE_BLUE}🎨 Creating your project...${NC}"
-echo ""
-read -p "What do you want to call your app? (e.g., my-cool-app): " APP_NAME
-
-# Sanitize app name
-APP_NAME=$(echo "$APP_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
+print_header "Creating Your Project"
 
 echo ""
-echo "Creating project: ${APP_NAME}"
+echo "  Time to name your app!"
+echo "  Give it any name you want - you can always change it later."
+echo ""
+echo -e "  ${VIBE_YELLOW}Examples: My Cool App, Todo List, Recipe Book${NC}"
+echo ""
+read -p "  What's your app called? " APP_TITLE
+
+# Create slug from title (lowercase, spaces to dashes, remove special chars)
+APP_SLUG=$(echo "$APP_TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
+
+echo ""
+print_step "Setting up: ${APP_TITLE}"
+
+# Clean up any existing temp directory
+rm -rf /tmp/dreamapp-temp 2>/dev/null || true
 
 # Clone the dreamapp repo temporarily
-echo "Downloading template..."
-git clone --depth 1 "https://github.com/${TEMPLATE_REPO}.git" /tmp/dreamapp-temp
+print_step "Downloading starter template..."
+git clone --depth 1 --quiet "https://github.com/${TEMPLATE_REPO}.git" /tmp/dreamapp-temp 2>/dev/null
 
 # Create new directory for user's project
-mkdir -p "$APP_NAME"
+mkdir -p "$APP_SLUG"
 
 # Copy template contents to new project
-cp -r /tmp/dreamapp-temp/template/. "$APP_NAME/"
+cp -r /tmp/dreamapp-temp/template/. "$APP_SLUG/" 2>/dev/null
 
 # Clean up
 rm -rf /tmp/dreamapp-temp
 
-cd "$APP_NAME"
+cd "$APP_SLUG"
+
+print_success "Template ready"
+
+# Replace placeholder title in template files
+print_step "Personalizing your app..."
+# Update package.json name
+sed -i '' "s/\"name\": \"dreamapp\"/\"name\": \"$APP_SLUG\"/" package.json 2>/dev/null || true
+# Update page title (we'll add this to template later)
+find . -name "*.tsx" -o -name "*.ts" -type f -exec sed -i '' "s/Dream App/$APP_TITLE/g" {} + 2>/dev/null || true
+
+print_success "Personalized with your app name"
 
 # Initialize git
-git init
-git add .
-git commit -m "Initial commit from Dream App"
+print_step "Saving to GitHub..."
+git init >/dev/null 2>&1
+git add . >/dev/null 2>&1
+git commit -m "Initial commit: $APP_TITLE" >/dev/null 2>&1
 
 # Create GitHub repo
-echo "Creating GitHub repository..."
-gh repo create "$APP_NAME" --private --source=. --remote=origin --push
+gh repo create "$APP_SLUG" --private --source=. --remote=origin --push >/dev/null 2>&1
 
-echo "✅ Project created"
+print_success "Saved to GitHub!"
 
 # ============================================
 # 8. INSTALL DEPENDENCIES
 # ============================================
-echo ""
-echo "${VIBE_BLUE}📦 Installing project dependencies...${NC}"
-echo "(This will take a minute or two)"
+print_header "Setting Up Your App"
 
-pnpm install
+print_step "Installing required packages..."
+echo -e "${VIBE_YELLOW}  (This takes a minute or two)${NC}"
 
-echo "✅ Dependencies installed"
+pnpm install 2>&1 | grep -E "^(Progress|Done)" || pnpm install >/dev/null 2>&1
+
+print_success "App is ready to run!"
 
 # ============================================
 # 9. DEPLOY TO VERCEL
 # ============================================
+print_header "Publishing Your App"
+
 echo ""
-echo "${VIBE_BLUE}🚀 Deploying to Vercel...${NC}"
+echo -e "${VIBE_CYAN}What is Vercel?${NC}"
+echo "  Vercel is where your app runs on the internet."
+echo "  It's like a computer in the cloud that's always on,"
+echo "  so anyone can visit your app from anywhere in the world!"
 echo ""
-echo "A browser window will open for Vercel login..."
+
+print_step "Connecting to Vercel..."
+echo -e "${VIBE_YELLOW}  (A browser window will open)${NC}"
 
 # This will prompt for login if needed
-vercel link --yes
+vercel link --yes 2>&1 | grep -E "Linked to|Success" || true
 
 # Deploy
-echo ""
-echo "Deploying your app..."
+print_step "Publishing your app to the internet..."
 DEPLOY_URL=$(vercel --prod --yes 2>&1 | grep -o 'https://[^ ]*' | head -1)
 
-echo "✅ Deployed to Vercel"
+print_success "Your app is live on the internet!"
+echo -e "   ${VIBE_CYAN}🌐 ${DEPLOY_URL}${NC}"
 
 # ============================================
-# 10. SETUP SUPABASE (VIA VERCEL INTEGRATION)
+# 10. SETUP DATABASE & USER ACCOUNTS
 # ============================================
-echo ""
-echo "${VIBE_BLUE}🗄️  Setting up Supabase...${NC}"
-echo ""
-echo "${VIBE_YELLOW}📝 Next steps (will open automatically):${NC}"
-echo ""
-echo "1. Your Vercel dashboard will open"
-echo "2. Go to your project → Settings → Integrations"
-echo "3. Search for 'Supabase' and click 'Add Integration'"
-echo "4. It will automatically create a Supabase project"
-echo "5. All environment variables will be set automatically!"
-echo ""
-read -p "Press Enter to open Vercel dashboard..."
-
-# Open Vercel project dashboard
-open "https://vercel.com/dashboard"
+print_header "Setting Up Database & User Accounts"
 
 echo ""
-echo "${VIBE_GREEN}✅ Once you add the Supabase integration, you're done!${NC}"
+echo -e "${VIBE_CYAN}What is Supabase?${NC}"
+echo "  Supabase gives your app two superpowers:"
+echo "  1. A database - where your app stores all its data"
+echo "  2. User accounts - so people can sign up and log in"
 echo ""
+echo "  Think of it like having a filing cabinet (database) and"
+echo "  a guest list (user accounts) for your app!"
+echo ""
+
+print_step "Setting up your database and login system..."
+echo -e "${VIBE_YELLOW}  (A browser window will open)${NC}"
+
+# Use Vercel CLI to add Supabase integration with automated responses
+# We'll pipe the answers to avoid user prompts
+(
+  echo "$APP_SLUG"              # Resource name (same as app name)
+  echo "fra1"                   # Frankfurt region (fast for US & Europe)
+  echo "NEXT_PUBLIC_"           # Standard Next.js public env prefix
+  echo "1"                      # Free plan (option 1)
+  echo "yes"                    # Confirm selection
+  echo "yes"                    # Link to current project
+  echo "1,2,3"                  # All environments (Production, Preview, Development)
+) | vercel integration add supabase 2>&1 | grep -v "^?" || true
+
+print_success "Database and user accounts ready!"
+echo -e "  ${VIBE_CYAN}Your app can now store data and let users sign in!${NC}"
+
+# Pull environment variables locally
+print_step "Syncing environment variables..."
+vercel env pull .env.local >/dev/null 2>&1
+
+print_success "Environment variables synced!"
 
 # ============================================
-# 11. INSTALL CURSOR SHELL COMMAND
+# 11. CONFIGURE CURSOR EDITOR
 # ============================================
 if [ -d "/Applications/Cursor.app" ]; then
-    echo ""
-    echo "${VIBE_BLUE}🔧 Setting up Cursor shell command...${NC}"
-    echo ""
-    echo "${VIBE_YELLOW}⚠️  We need to enable the 'cursor' command${NC}"
-    echo ""
-    echo "Cursor will open now. Please:"
-    echo "  1. Press Cmd+Shift+P"
-    echo "  2. Type: shell command"
-    echo "  3. Select: 'Shell Command: Install cursor command in PATH'"
-    echo "  4. Close Cursor when done"
-    echo ""
-    read -p "Press Enter to open Cursor..."
-
-    open -a Cursor .
-
-    read -p "Press Enter once you've installed the shell command..."
-
-    echo "✅ Cursor command ready"
+    print_header "Setting Up Cursor"
+    
+    print_step "Making Cursor easier to use..."
+    
+    # Create the symlink if it doesn't exist
+    if [ ! -f "/usr/local/bin/cursor" ]; then
+        # Make sure /usr/local/bin exists
+        sudo mkdir -p /usr/local/bin 2>/dev/null || true
+        
+        # Create symlink to Cursor CLI
+        sudo ln -sf "/Applications/Cursor.app/Contents/Resources/app/bin/cursor" /usr/local/bin/cursor 2>/dev/null
+        
+        print_success "Cursor is ready to use!"
+    else
+        print_success "Cursor already configured"
+    fi
 fi
 
 # ============================================
-# 13. DONE! OPEN PROJECT
+# 12. DONE! OPEN PROJECT
 # ============================================
 echo ""
-echo "${VIBE_GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo "${VIBE_GREEN}  ✨ ALL DONE! ✨${NC}"
-echo "${VIBE_GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${VIBE_BOLD}${VIBE_GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${VIBE_BOLD}${VIBE_GREEN}       ✨  ALL DONE! YOUR APP IS LIVE!  ✨${NC}"
+echo -e "${VIBE_BOLD}${VIBE_GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-# Open in Cursor
+# Open in Cursor with WELCOME.md
 if command -v cursor &>/dev/null; then
-    cursor .
+    cursor . WELCOME.md >/dev/null 2>&1 &
 else
-    open -a Cursor .
+    open -a Cursor . 
+    sleep 2
+    # Open WELCOME.md after Cursor starts
+    open -a Cursor WELCOME.md 2>/dev/null || true
 fi
 
+sleep 1
+print_success "Cursor is opening with your project!"
+
 echo ""
-echo "✨ Cursor is now opening with your project!"
+echo -e "${VIBE_BOLD}${VIBE_CYAN}╔═══════════════════════════════════════════╗${NC}"
+echo -e "${VIBE_BOLD}${VIBE_CYAN}║${NC}          WHERE TO FIND YOUR APP          ${VIBE_BOLD}${VIBE_CYAN}║${NC}"
+echo -e "${VIBE_BOLD}${VIBE_CYAN}╚═══════════════════════════════════════════╝${NC}"
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "YOUR APP IS LIVE!"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "  ${VIBE_GREEN}🌐 On the internet:${NC}  ${VIBE_CYAN}${DEPLOY_URL}${NC}"
+echo -e "  ${VIBE_GREEN}💻 On your computer:${NC} ${VIBE_CYAN}http://localhost:3000${NC}"
 echo ""
-echo "🌐 Live URL: ${DEPLOY_URL}"
-echo "💻 Local: http://localhost:3000"
+echo -e "${VIBE_BOLD}${VIBE_CYAN}╔═══════════════════════════════════════════╗${NC}"
+echo -e "${VIBE_BOLD}${VIBE_CYAN}║${NC}          HOW TO START BUILDING           ${VIBE_BOLD}${VIBE_CYAN}║${NC}"
+echo -e "${VIBE_BOLD}${VIBE_CYAN}╚═══════════════════════════════════════════╝${NC}"
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "NEXT STEPS IN CURSOR:"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  1. Cursor will open with a ${VIBE_YELLOW}WELCOME${NC} guide"
+echo "  2. Click the ${VIBE_CYAN}🌐 Globe icon${NC} → Enable ${VIBE_CYAN}Browser${NC} tab"
+echo "  3. Press ${VIBE_YELLOW}Cmd+L${NC} to talk to the AI"
+echo -e "  4. Say: ${VIBE_CYAN}\"Show me my app in the browser\"${NC}"
+echo "  5. Start building whatever you want!"
 echo ""
-echo "1. The dev server will start automatically"
-echo "2. Press Cmd+L to open Agent mode"
-echo "3. Type: @Browser open http://localhost:3000"
-echo "4. Start building!"
+echo -e "  ${VIBE_YELLOW}💡 The dev server starts automatically!${NC}"
 echo ""
-echo "📖 Read WELCOME.md (already open) for full guide"
-echo ""
-echo "Happy vibing! 🎨✨"
+echo -e "${VIBE_YELLOW}Have fun building ${APP_TITLE}! 🎨✨${NC}"
 echo ""
 

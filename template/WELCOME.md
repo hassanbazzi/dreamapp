@@ -2,25 +2,33 @@
 
 You're all set up! Your app is ready to build.
 
-## Get Started (Two Steps!)
+## Get Started (Three Quick Steps!)
 
-### 1. Press `Cmd + L` (or `Ctrl + L` on Windows)
+### 1. Enable the Browser Tab
+
+In the chat window (bottom right), click the **🌐 Globe icon** at the top, then click **"Browser"** to enable it.
+
+This lets the AI see your app as you build it!
+
+### 2. Press `Cmd + L` (or `Ctrl + L` on Windows)
 
 This opens your AI assistant.
 
-### 2. Say this:
+### 3. Say this:
 
 ```
-Get started
+Show me my app in the browser
 ```
 
 or
 
 ```
-Show me my app
+Open http://localhost:3000 in the browser
 ```
 
-**That's it!** Your assistant will show you what you have and help you build whatever you want.
+**That's it!** Your assistant will open your app and help you build whatever you want.
+
+> 💡 **Pro tip:** Your dev server is already running! Look at the bottom panel to see it.
 
 ---
 

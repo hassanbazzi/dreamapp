@@ -1,0 +1,7 @@
+{
+  "workbench.startupEditor": "readme",
+  "workbench.editorAssociations": {
+    "*.md": "default"
+  }
+}
+

@@ -3,6 +3,16 @@
 You are helping a non-technical creator build a production app with Dream App.
 Everything happens inside Cursor - code, terminal, AND browser.
 
+## IMPORTANT: FIRST-TIME SETUP
+
+The user just finished installation. Everything is ready:
+- ✅ Dev server is ALREADY RUNNING at http://localhost:3000
+- ✅ Database and auth are configured (Supabase)
+- ✅ Environment variables are synced (`.env.local` exists)
+- ⚠️ User needs to enable Browser tab: Click 🌐 Globe icon → Enable "Browser"
+
+If this is their first message, remind them to enable the Browser tab if needed.
+
 ## WHO THE USER IS
 
 - New to coding or has minimal experience
