@@ -330,26 +330,27 @@ set send_human {.1 .3 1 .05 2}
 spawn vercel integration add supabase
 
 expect {
-    "Choose your region" {
-        # Navigate to Frankfurt (fra1) - typically 5 down from default
-        sleep 0.5
-        send "\033\[B\033\[B\033\[B\033\[B\033\[B"
-        sleep 0.5
-        send "\r"
-        exp_continue
-    }
     "What is the name of the resource?" {
         send "$env(APP_SLUG)\r"
         exp_continue
     }
-    "*prefix*" {
-        send "NEXT_PUBLIC_\r"
+    "Choose your region" {
+        # Navigate to Frankfurt (fra1) - 4 down from iad1
+        sleep 0.5
+        send "\033\[B\033\[B\033\[B\033\[B"
+        sleep 0.5
+        send "\r"
+        exp_continue
+    }
+    -re "NEXT_PUBLIC_.*\\(" {
+        # Just press Enter to accept default prefix
+        send "\r"
         exp_continue
     }
     "Choose a billing plan" {
-        # Navigate to Free plan (3 down from default)
+        # Navigate to Free plan (2 down from Pro Plan)
         sleep 0.5
-        send "\033\[B\033\[B\033\[B"
+        send "\033\[B\033\[B"
         sleep 0.5
         send "\r"
         exp_continue
