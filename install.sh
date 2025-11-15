@@ -323,50 +323,56 @@ if ! command -v expect &> /dev/null; then
     brew install expect >/dev/null 2>&1
 fi
 
-# Create expect script to automate Vercel Supabase integration
-expect -c "
+# Create expect script as a temporary file
+EXPECT_SCRIPT=$(mktemp)
+cat > "$EXPECT_SCRIPT" << 'EXPECTEOF'
+#!/usr/bin/expect -f
 set timeout 120
+
+# Connect to actual terminal
+set send_human {.1 .3 1 .05 2}
+
 spawn vercel integration add supabase
 
-# Region selection
-expect \"Choose your region\" {
-    send \"\r\"
+expect {
+    "Choose your region" {
+        send "\r"
+        exp_continue
+    }
+    "What is the name of the resource?" {
+        send "$env(APP_SLUG)\r"
+        exp_continue
+    }
+    "*prefix*" {
+        send "NEXT_PUBLIC_\r"
+        exp_continue
+    }
+    "Choose a billing plan" {
+        send "\r"
+        exp_continue
+    }
+    "Confirm selection?" {
+        send "y\r"
+        exp_continue
+    }
+    "*link this resource to the current project*" {
+        send "y\r"
+        exp_continue
+    }
+    "Select environments" {
+        send " \r"
+        exp_continue
+    }
+    eof
 }
+EXPECTEOF
 
-# Resource name
-expect \"What is the name of the resource?\" {
-    send \"$APP_SLUG\r\"
-}
+chmod +x "$EXPECT_SCRIPT"
 
-# Environment variable prefix
-expect \"*prefix*\" {
-    send \"NEXT_PUBLIC_\r\"
-}
-
-# Billing plan selection
-expect \"Choose a billing plan\" {
-    send \"\r\"
-}
-
-# Confirm selection
-expect \"Confirm selection?\" {
-    send \"y\r\"
-}
-
-# Link to project
-expect \"*link this resource to the current project*\" {
-    send \"y\r\"
-}
-
-# Environment selection - select all
-expect \"Select environments\" {
-    send \" \r\"
-}
-
-expect eof
-" > /dev/null 2>&1
-
-if [ $? -eq 0 ]; then
+# Run expect script with environment variable and terminal access
+if APP_SLUG="$APP_SLUG" expect "$EXPECT_SCRIPT" < /dev/tty > /dev/tty 2>&1; then
+    rm -f "$EXPECT_SCRIPT"
+    echo ""
     print_success "Database and user accounts ready!"
     echo -e "  ${VIBE_CYAN}Your app can now store data and let users sign in!${NC}"
     
@@ -379,6 +385,8 @@ if [ $? -eq 0 ]; then
         echo -e "  ${VIBE_CYAN}You can sync them later with: vercel env pull${NC}"
     fi
 else
+    rm -f "$EXPECT_SCRIPT"
+    echo ""
     print_warning "Supabase setup encountered an issue"
     echo -e "  ${VIBE_CYAN}You can complete this later in your Vercel dashboard${NC}"
     echo -e "  Or run: ${VIBE_YELLOW}vercel integration add supabase${NC}"
