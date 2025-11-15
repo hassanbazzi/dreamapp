@@ -316,29 +316,40 @@ echo "  a guest list (user accounts) for your app!"
 echo ""
 
 print_step "Setting up your database and login system..."
-echo -e "${VIBE_YELLOW}  (A browser window will open - you'll need to make a few choices)${NC}"
+echo -e "${VIBE_YELLOW}  (A browser window may open - follow the prompts below)${NC}"
 echo ""
-echo -e "${VIBE_CYAN}  When prompted:${NC}"
-echo "  1. Choose any region (iad1 or fra1 recommended)"
-echo "  2. Keep default name: ${VIBE_YELLOW}${APP_SLUG}${NC}"
-echo "  3. Keep prefix: ${VIBE_YELLOW}NEXT_PUBLIC_${NC}"
-echo "  4. Select the ${VIBE_YELLOW}Free${NC} plan"
-echo "  5. Link to ${VIBE_YELLOW}all environments${NC} (Production, Preview, Development)"
+echo -e "${VIBE_CYAN}  When prompted, select:${NC}"
+echo "  • ${VIBE_YELLOW}Region:${NC} Any region (iad1 or fra1 recommended)"
+echo "  • ${VIBE_YELLOW}Name:${NC} Keep the default (${APP_SLUG})"
+echo "  • ${VIBE_YELLOW}Prefix:${NC} Keep NEXT_PUBLIC_"
+echo "  • ${VIBE_YELLOW}Plan:${NC} Free"
+echo "  • ${VIBE_YELLOW}Link to project:${NC} Yes"
+echo "  • ${VIBE_YELLOW}Environments:${NC} All (Production, Preview, Development)"
 echo ""
-read -p "Press Enter when ready to continue..." < /dev/tty
+read -p "Press Enter to continue..." < /dev/tty
 echo ""
 
-# Run Vercel integration with terminal access
-vercel integration add supabase < /dev/tty
-
-print_success "Database and user accounts ready!"
-echo -e "  ${VIBE_CYAN}Your app can now store data and let users sign in!${NC}"
-
-# Pull environment variables locally
-print_step "Syncing environment variables..."
-vercel env pull .env.local >/dev/null 2>&1
-
-print_success "Environment variables synced!"
+# Run Vercel integration with proper terminal access
+# Redirect both stdin and stdout/stderr to terminal to ensure interactivity works
+if vercel integration add supabase < /dev/tty > /dev/tty 2>&1; then
+    echo ""
+    print_success "Database and user accounts ready!"
+    echo -e "  ${VIBE_CYAN}Your app can now store data and let users sign in!${NC}"
+    
+    # Pull environment variables locally
+    print_step "Syncing environment variables..."
+    if vercel env pull .env.local >/dev/null 2>&1; then
+        print_success "Environment variables synced!"
+    else
+        print_warning "Could not sync environment variables automatically"
+        echo -e "  ${VIBE_CYAN}You can sync them later with: vercel env pull${NC}"
+    fi
+else
+    echo ""
+    print_warning "Supabase setup encountered an issue"
+    echo -e "  ${VIBE_CYAN}You can complete this later in your Vercel dashboard${NC}"
+    echo -e "  Or run: ${VIBE_YELLOW}vercel integration add supabase${NC}"
+fi
 
 # ============================================
 # 11. CONFIGURE CURSOR EDITOR
