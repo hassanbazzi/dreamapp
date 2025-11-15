@@ -430,10 +430,13 @@ if [ -d "/Applications/Cursor.app" ]; then
     else
         print_success "Cursor already configured"
     fi
+    
+    # Make initialization script executable
+    chmod +x .cursor/init.sh 2>/dev/null || true
 fi
 
 # ============================================
-# 12. DONE! OPEN PROJECT
+# 13. DONE! OPEN PROJECT
 # ============================================
 echo ""
 echo -e "${VIBE_BOLD}${VIBE_GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -463,16 +466,16 @@ echo -e "  ${VIBE_GREEN}🌐 On the internet:${NC}  ${VIBE_CYAN}${DEPLOY_URL}${N
 echo -e "  ${VIBE_GREEN}💻 On your computer:${NC} ${VIBE_CYAN}http://localhost:3000${NC}"
 echo ""
 echo -e "${VIBE_BOLD}${VIBE_CYAN}╔═══════════════════════════════════════════╗${NC}"
-echo -e "${VIBE_BOLD}${VIBE_CYAN}║${NC}          HOW TO START BUILDING           ${VIBE_BOLD}${VIBE_CYAN}║${NC}"
+echo -e "${VIBE_BOLD}${VIBE_CYAN}║${NC}          WHAT HAPPENS NEXT              ${VIBE_BOLD}${VIBE_CYAN}║${NC}"
 echo -e "${VIBE_BOLD}${VIBE_CYAN}╚═══════════════════════════════════════════╝${NC}"
 echo ""
-echo "  1. Cursor will open with a ${VIBE_YELLOW}WELCOME${NC} guide"
-echo "  2. Click the ${VIBE_CYAN}🌐 Globe icon${NC} → Enable ${VIBE_CYAN}Browser${NC} tab"
-echo "  3. Press ${VIBE_YELLOW}Cmd+L${NC} to talk to the AI"
-echo -e "  4. Say: ${VIBE_CYAN}\"Show me my app in the browser\"${NC}"
-echo "  5. Start building whatever you want!"
+echo -e "  ${VIBE_GREEN}✨ Cursor opens automatically${NC}"
+echo -e "  ${VIBE_GREEN}✨ Welcome guide shows up${NC}"
+echo -e "  ${VIBE_GREEN}✨ Dev server starts${NC}"
+echo -e "  ${VIBE_GREEN}✨ Browser opens with your app${NC}"
+echo -e "  ${VIBE_GREEN}✨ AI composer ready to help${NC}"
 echo ""
-echo -e "  ${VIBE_YELLOW}💡 The dev server starts automatically!${NC}"
+echo -e "  ${VIBE_CYAN}Just follow along and start building!${NC}"
 echo ""
 echo -e "${VIBE_YELLOW}Have fun building ${APP_TITLE}! 🎨✨${NC}"
 echo ""

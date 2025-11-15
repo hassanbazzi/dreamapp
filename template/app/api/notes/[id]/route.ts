@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
-import { db } from "@/lib/db"
 import { notes } from "@/db/schema"
+import { db } from "@/lib/db"
 import { eq } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 // PATCH /api/notes/[id] - Update a note
 export async function PATCH(
@@ -55,4 +55,3 @@ export async function DELETE(
     )
   }
 }
-
