@@ -330,36 +330,40 @@ set send_human {.1 .3 1 .05 2}
 spawn vercel integration add supabase
 
 expect {
-    "What is the name of the resource?" {
+    -re "\\? What is the name of the resource\\?" {
         send "$env(APP_SLUG)\r"
         exp_continue
     }
-    "Choose your region" {
+    -re "\\? Choose your region" {
         # Type desired region so CLI filters automatically
         sleep 0.5
-        send "fra1\r"
+        send -- "fra1"
+        sleep 0.3
+        send "\r"
         exp_continue
     }
-    -re "NEXT_PUBLIC_.*\\(" {
+    -re "\\? NEXT_PUBLIC_" {
         # Just press Enter to accept default prefix
         send "\r"
         exp_continue
     }
-    "Choose a billing plan" {
+    -re "\\? Choose a billing plan" {
         # Type plan name directly to select Free tier
         sleep 0.5
-        send "Supabase Free Plan\r"
+        send -- "Supabase Free Plan"
+        sleep 0.3
+        send "\r"
         exp_continue
     }
-    "Confirm selection?" {
+    -re "\\? Confirm selection" {
         send "y\r"
         exp_continue
     }
-    "*link this resource to the current project*" {
+    -re "\\? Do you want to link this resource to the current project" {
         send "y\r"
         exp_continue
     }
-    "Select environments" {
+    -re "\\? Select environments" {
         # All environments already selected by default, just press Enter
         send "\r"
         exp_continue
