@@ -276,9 +276,9 @@ pnpm install 2>&1 | grep -E "^(Progress|Done)" || pnpm install >/dev/null 2>&1
 print_success "App is ready to run!"
 
 # ============================================
-# 9. DEPLOY TO VERCEL
+# 9. CONNECT TO VERCEL
 # ============================================
-print_header "Publishing Your App"
+print_header "Connecting to Vercel"
 
 echo ""
 echo -e "${VIBE_CYAN}What is Vercel?${NC}"
@@ -290,15 +290,10 @@ echo ""
 print_step "Connecting to Vercel..."
 echo -e "${VIBE_YELLOW}  (A browser window will open)${NC}"
 
-# This will prompt for login if needed
+# This will prompt for login if needed and create the project
 vercel link --yes 2>&1 | grep -E "Linked to|Success" || true
 
-# Deploy
-print_step "Publishing your app to the internet..."
-DEPLOY_URL=$(vercel --prod --yes 2>&1 | grep -o 'https://[^ ]*' | head -1)
-
-print_success "Your app is live on the internet!"
-echo -e "   ${VIBE_CYAN}🌐 ${DEPLOY_URL}${NC}"
+print_success "Connected to Vercel!"
 
 # ============================================
 # 10. SETUP DATABASE & USER ACCOUNTS
@@ -402,7 +397,21 @@ else
 fi
 
 # ============================================
-# 11. CONFIGURE CURSOR EDITOR
+# 11. DEPLOY TO VERCEL
+# ============================================
+print_header "Publishing Your App"
+
+print_step "Publishing your app to the internet..."
+echo -e "${VIBE_YELLOW}  (Building with database connected - this may take a minute)${NC}"
+
+# Deploy with environment variables now available
+DEPLOY_URL=$(vercel --prod --yes 2>&1 | grep -o 'https://[^ ]*' | head -1)
+
+print_success "Your app is live on the internet!"
+echo -e "   ${VIBE_CYAN}🌐 ${DEPLOY_URL}${NC}"
+
+# ============================================
+# 12. CONFIGURE CURSOR EDITOR
 # ============================================
 if [ -d "/Applications/Cursor.app" ]; then
     print_header "Setting Up Cursor"
