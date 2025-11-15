@@ -336,6 +336,10 @@ spawn vercel integration add supabase
 
 expect {
     "Choose your region" {
+        # Navigate to Frankfurt (fra1) - typically 5 down from default
+        sleep 0.5
+        send "\033\[B\033\[B\033\[B\033\[B\033\[B"
+        sleep 0.5
         send "\r"
         exp_continue
     }
@@ -348,9 +352,9 @@ expect {
         exp_continue
     }
     "Choose a billing plan" {
-        # Navigate to Free plan (top of list)
+        # Navigate to Free plan (3 down from default)
         sleep 0.5
-        send "\033\[A\033\[A\033\[A\033\[A\033\[A"
+        send "\033\[B\033\[B\033\[B"
         sleep 0.5
         send "\r"
         exp_continue
@@ -364,15 +368,7 @@ expect {
         exp_continue
     }
     "Select environments" {
-        # Select all environments: space on each option
-        send " "
-        sleep 0.2
-        send "\033\[B"
-        send " "
-        sleep 0.2
-        send "\033\[B"
-        send " "
-        sleep 0.2
+        # All environments already selected by default, just press Enter
         send "\r"
         exp_continue
     }
