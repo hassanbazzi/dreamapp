@@ -18,7 +18,6 @@ export async function PATCH(
       .set({
         ...(title && { title }),
         ...(noteBody !== undefined && { body: noteBody }),
-        updatedAt: new Date(),
       })
       .where(eq(notes.id, id))
       .returning()

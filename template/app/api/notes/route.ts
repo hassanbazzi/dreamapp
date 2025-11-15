@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
-import { db } from "@/lib/db"
 import { notes } from "@/db/schema"
+import { db } from "@/lib/db"
 import { eq } from "drizzle-orm"
+import { NextRequest, NextResponse } from "next/server"
 
 // GET /api/notes - List all notes for user
 export async function GET(request: NextRequest) {
@@ -38,14 +38,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 })
     }
 
-    const [note] = await db
-      .insert(notes)
-      .values({
-        userId,
-        title,
-        body: noteBody,
-      })
-      .returning()
+    const insertData: any = {
+      userId,
+      title,
+    }
+
+    if (noteBody !== undefined) {
+      insertData.body = noteBody
+    }
+
+    const [note] = await db.insert(notes).values(insertData).returning()
 
     return NextResponse.json(note, { status: 201 })
   } catch (error) {
@@ -56,4 +58,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

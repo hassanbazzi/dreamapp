@@ -17,8 +17,8 @@ export const notes = pgTable("notes", {
     .notNull()
     .references(() => profiles.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
-  body: text("body"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  body: text("body").default(""),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
 })
 
