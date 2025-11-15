@@ -316,23 +316,57 @@ echo "  a guest list (user accounts) for your app!"
 echo ""
 
 print_step "Setting up your database and login system..."
-echo -e "${VIBE_YELLOW}  (A browser window may open - follow the prompts below)${NC}"
-echo ""
-echo -e "${VIBE_CYAN}  When prompted, select:${NC}"
-echo "  • ${VIBE_YELLOW}Region:${NC} Any region (iad1 or fra1 recommended)"
-echo "  • ${VIBE_YELLOW}Name:${NC} Keep the default (${APP_SLUG})"
-echo "  • ${VIBE_YELLOW}Prefix:${NC} Keep NEXT_PUBLIC_"
-echo "  • ${VIBE_YELLOW}Plan:${NC} Free"
-echo "  • ${VIBE_YELLOW}Link to project:${NC} Yes"
-echo "  • ${VIBE_YELLOW}Environments:${NC} All (Production, Preview, Development)"
-echo ""
-read -p "Press Enter to continue..." < /dev/tty
-echo ""
+echo -e "${VIBE_YELLOW}  (Setting up automatically - this may take a minute)${NC}"
 
-# Run Vercel integration with proper terminal access
-# Redirect both stdin and stdout/stderr to terminal to ensure interactivity works
-if vercel integration add supabase < /dev/tty > /dev/tty 2>&1; then
-    echo ""
+# Install expect if not present (needed for automation)
+if ! command -v expect &> /dev/null; then
+    brew install expect >/dev/null 2>&1
+fi
+
+# Create expect script to automate Vercel Supabase integration
+expect -c "
+set timeout 120
+spawn vercel integration add supabase
+
+# Region selection
+expect \"Choose your region\" {
+    send \"\r\"
+}
+
+# Resource name
+expect \"What is the name of the resource?\" {
+    send \"$APP_SLUG\r\"
+}
+
+# Environment variable prefix
+expect \"*prefix*\" {
+    send \"NEXT_PUBLIC_\r\"
+}
+
+# Billing plan selection
+expect \"Choose a billing plan\" {
+    send \"\r\"
+}
+
+# Confirm selection
+expect \"Confirm selection?\" {
+    send \"y\r\"
+}
+
+# Link to project
+expect \"*link this resource to the current project*\" {
+    send \"y\r\"
+}
+
+# Environment selection - select all
+expect \"Select environments\" {
+    send \" \r\"
+}
+
+expect eof
+" > /dev/null 2>&1
+
+if [ $? -eq 0 ]; then
     print_success "Database and user accounts ready!"
     echo -e "  ${VIBE_CYAN}Your app can now store data and let users sign in!${NC}"
     
@@ -345,7 +379,6 @@ if vercel integration add supabase < /dev/tty > /dev/tty 2>&1; then
         echo -e "  ${VIBE_CYAN}You can sync them later with: vercel env pull${NC}"
     fi
 else
-    echo ""
     print_warning "Supabase setup encountered an issue"
     echo -e "  ${VIBE_CYAN}You can complete this later in your Vercel dashboard${NC}"
     echo -e "  Or run: ${VIBE_YELLOW}vercel integration add supabase${NC}"
