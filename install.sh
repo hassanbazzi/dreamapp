@@ -316,19 +316,20 @@ echo "  a guest list (user accounts) for your app!"
 echo ""
 
 print_step "Setting up your database and login system..."
-echo -e "${VIBE_YELLOW}  (A browser window will open)${NC}"
+echo -e "${VIBE_YELLOW}  (A browser window will open - you'll need to make a few choices)${NC}"
+echo ""
+echo -e "${VIBE_CYAN}  When prompted:${NC}"
+echo "  1. Choose any region (iad1 or fra1 recommended)"
+echo "  2. Keep default name: ${VIBE_YELLOW}${APP_SLUG}${NC}"
+echo "  3. Keep prefix: ${VIBE_YELLOW}NEXT_PUBLIC_${NC}"
+echo "  4. Select the ${VIBE_YELLOW}Free${NC} plan"
+echo "  5. Link to ${VIBE_YELLOW}all environments${NC} (Production, Preview, Development)"
+echo ""
+read -p "Press Enter when ready to continue..." < /dev/tty
+echo ""
 
-# Use Vercel CLI to add Supabase integration with automated responses
-# We'll pipe the answers to avoid user prompts
-(
-  echo "$APP_SLUG"              # Resource name (same as app name)
-  echo "fra1"                   # Frankfurt region (fast for US & Europe)
-  echo "NEXT_PUBLIC_"           # Standard Next.js public env prefix
-  echo "1"                      # Free plan (option 1)
-  echo "yes"                    # Confirm selection
-  echo "yes"                    # Link to current project
-  echo "1,2,3"                  # All environments (Production, Preview, Development)
-) | vercel integration add supabase 2>&1 | grep -v "^?" || true
+# Run Vercel integration with terminal access
+vercel integration add supabase < /dev/tty
 
 print_success "Database and user accounts ready!"
 echo -e "  ${VIBE_CYAN}Your app can now store data and let users sign in!${NC}"
