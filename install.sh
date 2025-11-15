@@ -201,7 +201,21 @@ echo "  Give it any name you want - you can always change it later."
 echo ""
 echo -e "  ${VIBE_YELLOW}Examples: My Cool App, Todo List, Recipe Book${NC}"
 echo ""
-read -p "  What's your app called? " APP_TITLE
+
+# Keep asking until we get a valid non-empty name
+while true; do
+    read -p "  What's your app called? " APP_TITLE
+    
+    # Remove leading/trailing whitespace
+    APP_TITLE=$(echo "$APP_TITLE" | xargs)
+    
+    if [ -n "$APP_TITLE" ]; then
+        break
+    fi
+    
+    echo -e "${VIBE_RED}✗ Please enter a name for your app${NC}"
+    echo ""
+done
 
 # Create slug from title (lowercase, spaces to dashes, remove special chars)
 APP_SLUG=$(echo "$APP_TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
