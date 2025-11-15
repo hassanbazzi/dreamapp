@@ -17,7 +17,7 @@
         }
       },
       "presentation": {
-        "reveal": "always",
+        "reveal": "silent",
         "panel": "dedicated",
         "focus": false,
         "echo": true,
@@ -27,7 +27,22 @@
       "runOptions": {
         "runOn": "folderOpen"
       }
+    },
+    {
+      "label": "🎨 Initialize Workspace",
+      "type": "shell",
+      "command": "bash ${workspaceFolder}/.vscode/init.sh",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "focus": false,
+        "showReuseMessage": false
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
     }
   ]
 }
-

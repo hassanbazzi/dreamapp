@@ -163,9 +163,9 @@ This gives you the nice URL: `curl -fsSL getdreamapp.com/install | bash`
 - How to use @Browser to test features
 - When to ask permission
 
-**`.vscode/tasks.json`** - Auto-starts dev server when Cursor opens
+**`.vscode/tasks.json`** - Auto-starts dev server and opens browser when Cursor opens
 
-**`WELCOME.md`** - First thing users see with clear instructions
+**`app/page.tsx`** - Beautiful welcome page with clear getting started instructions
 
 ## Why This Exists
 

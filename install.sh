@@ -368,17 +368,14 @@ expect {
         # Wait for Supabase Free Plan to be selected
         expect -re {❯.*Supabase Free Plan|Supabase Free Plan.*❯}
         send "\r"
-        exp_continue
-    }
-    -re {.*Confirm selection.*} {
+        # Handle confirmation prompt
+        expect -re {Confirm selection}
         send "y\r"
-        exp_continue
-    }
-    -re {.*link this resource to the current project.*} {
+        # Handle link to project prompt
+        expect -re {link this resource}
         send "y\r"
-        exp_continue
-    }
-    -re {.*Select environments.*} {
+        # Handle environment selection
+        expect -re {Select environments}
         send "\r"
         exp_continue
     }
@@ -447,7 +444,27 @@ if [ -d "/Applications/Cursor.app" ]; then
     fi
     
     # Make initialization script executable
-    chmod +x .cursor/init.sh 2>/dev/null || true
+    if [ -f ".vscode/init.sh" ]; then
+        chmod +x .vscode/init.sh 2>/dev/null || true
+    fi
+    
+    # Request accessibility permissions for automation
+    print_step "Requesting accessibility permissions..."
+    echo ""
+    echo -e "${VIBE_YELLOW}  📋 macOS will ask if Cursor can control your computer${NC}"
+    echo -e "${VIBE_YELLOW}  ✅ Please click 'OK' or 'Allow' to enable automation${NC}"
+    echo -e "${VIBE_YELLOW}  (This lets Cursor automatically open your app)${NC}"
+    echo ""
+    
+    # Trigger accessibility permission prompt
+    osascript -e 'tell application "System Events" to keystroke ""' 2>/dev/null || {
+        echo -e "${VIBE_CYAN}  ℹ️  If prompted, go to:${NC}"
+        echo -e "${VIBE_CYAN}     System Settings → Privacy & Security → Accessibility${NC}"
+        echo -e "${VIBE_CYAN}     And enable 'Cursor' or 'Terminal'${NC}"
+    }
+    
+    sleep 2
+    print_success "Accessibility configured"
 fi
 
 # ============================================
@@ -459,14 +476,11 @@ echo -e "${VIBE_BOLD}${VIBE_GREEN}       ✨  ALL DONE! YOUR APP IS LIVE!  ✨${
 echo -e "${VIBE_BOLD}${VIBE_GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-# Open in Cursor with WELCOME.md
+# Open in Cursor
 if command -v cursor &>/dev/null; then
-    cursor . WELCOME.md >/dev/null 2>&1 &
+    cursor . >/dev/null 2>&1 &
 else
-    open -a Cursor . 
-    sleep 2
-    # Open WELCOME.md after Cursor starts
-    open -a Cursor WELCOME.md 2>/dev/null || true
+    open -a Cursor .
 fi
 
 sleep 1
@@ -485,10 +499,10 @@ echo -e "${VIBE_BOLD}${VIBE_CYAN}║${NC}          WHAT HAPPENS NEXT            
 echo -e "${VIBE_BOLD}${VIBE_CYAN}╚═══════════════════════════════════════════╝${NC}"
 echo ""
 echo -e "  ${VIBE_GREEN}✨ Cursor opens automatically${NC}"
-echo -e "  ${VIBE_GREEN}✨ Welcome guide shows up${NC}"
 echo -e "  ${VIBE_GREEN}✨ Dev server starts${NC}"
 echo -e "  ${VIBE_GREEN}✨ Browser opens with your app${NC}"
-echo -e "  ${VIBE_GREEN}✨ AI composer ready to help${NC}"
+echo -e "  ${VIBE_GREEN}✨ Welcome page loads at localhost:3000${NC}"
+echo -e "  ${VIBE_GREEN}✨ AI assistant ready to help${NC}"
 echo ""
 echo -e "  ${VIBE_CYAN}Just follow along and start building!${NC}"
 echo ""

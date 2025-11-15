@@ -13,9 +13,13 @@ dreamapp/
 ├── NEXT_STEPS.md         # This file
 └── template/             # The Next.js template
     ├── .cursorrules
-    ├── WELCOME.md
+    ├── .vscode/
+    │   ├── tasks.json    # Auto-starts dev server & browser
+    │   ├── init.sh       # Automation script
+    │   └── settings.json
     ├── package.json
     ├── app/
+    │   └── page.tsx      # Welcome page with instructions
     ├── components/
     ├── lib/
     └── ... (all template files)

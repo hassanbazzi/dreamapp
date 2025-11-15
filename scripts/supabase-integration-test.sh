@@ -61,17 +61,14 @@ expect {
         # Wait for Supabase Free Plan to be selected
         expect -re {❯.*Supabase Free Plan|Supabase Free Plan.*❯}
         send "\r"
-        exp_continue
-    }
-    -re {.*Confirm selection.*} {
+        # Handle confirmation prompt
+        expect -re {Confirm selection}
         send "y\r"
-        exp_continue
-    }
-    -re {.*link this resource to the current project.*} {
+        # Handle link to project prompt
+        expect -re {link this resource}
         send "y\r"
-        exp_continue
-    }
-    -re {.*Select environments.*} {
+        # Handle environment selection
+        expect -re {Select environments}
         send "\r"
         exp_continue
     }
