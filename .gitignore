@@ -27,6 +27,7 @@ Temporary Items
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/extensions.json
+!.vscode/init.sh
 .idea
 *.swp
 *.swo
