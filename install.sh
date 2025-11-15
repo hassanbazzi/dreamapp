@@ -56,7 +56,7 @@ echo "  Takes about 10-15 minutes, then you can start building!"
 echo ""
 echo -e "${VIBE_YELLOW}From getdreamapp.com with ❤️${NC}"
 echo ""
-read -p "Ready? Press Enter to start..."
+read -p "Ready? Press Enter to start..." < /dev/tty
 
 # ============================================
 # 1. CHECK MACOS
@@ -83,7 +83,7 @@ if ! xcode-select -p &>/dev/null; then
     xcode-select --install
     echo ""
     print_step "Waiting for Xcode tools to finish installing..."
-    read -p "Press Enter once the installation completes..."
+    read -p "Press Enter once the installation completes..." < /dev/tty
 fi
 
 print_success "Xcode Command Line Tools ready"
@@ -175,7 +175,7 @@ fi
 # Setup SSH if not exists
 if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
     echo ""
-    read -p "Enter your email: " USER_EMAIL
+    read -p "Enter your email: " USER_EMAIL < /dev/tty
     print_step "Setting up secure connection..."
     ssh-keygen -t ed25519 -C "$USER_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "" >/dev/null 2>&1
     eval "$(ssh-agent -s)" >/dev/null 2>&1
@@ -204,7 +204,7 @@ echo ""
 
 # Keep asking until we get a valid non-empty name
 while true; do
-    read -p "  What's your app called? " APP_TITLE
+    read -p "  What's your app called? " APP_TITLE < /dev/tty
     
     # Remove leading/trailing whitespace
     APP_TITLE=$(echo "$APP_TITLE" | xargs)
