@@ -37,6 +37,7 @@ Open http://localhost:3000 in the browser
 Just describe what you want in plain English:
 
 **Examples:**
+
 - "Add a page where users can create notes"
 - "Make the homepage more colorful"
 - "Add a profile page with user settings"
@@ -50,6 +51,7 @@ Your assistant will build it, test it, and show you it working.
 ## Need Help?
 
 Just ask your assistant:
+
 - "What can I build?"
 - "Show me some examples"
 - "I have an idea but not sure how to describe it"
