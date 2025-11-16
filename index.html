@@ -1104,7 +1104,7 @@
       onclick="toggleDarkMode()"
       aria-label="Toggle dark mode"
     >
-      <span id="dark-mode-icon">☀️</span>
+      <span id="dark-mode-icon">🌙</span>
     </button>
 
     <!-- Header -->
@@ -1520,12 +1520,12 @@
         if (isDark) {
           // Switch to light mode
           body.classList.remove("dark-mode")
-          icon.textContent = "☀️"
+          icon.textContent = "🌙"
           localStorage.setItem("darkMode", "false")
         } else {
           // Switch to dark mode
           body.classList.add("dark-mode")
-          icon.textContent = "🌙"
+          icon.textContent = "☀️"
           localStorage.setItem("darkMode", "true")
         }
       }
