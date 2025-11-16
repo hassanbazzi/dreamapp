@@ -396,7 +396,7 @@ if ! gh auth status &>/dev/null; then
     print_step "Signing in to GitHub..."
     echo -e "${VIBE_YELLOW}  (A browser window will open)${NC}"
     echo ""
-    if gh auth login; then
+    if gh auth login -s admin:public_key; then
         print_success "Signed in to GitHub"
     else
         print_error "Failed to sign in to GitHub"
@@ -406,6 +406,23 @@ if ! gh auth status &>/dev/null; then
     fi
 else
     print_success "Already signed in to GitHub"
+    
+    # Ensure we have the necessary scope for SSH key management
+    print_step "Verifying GitHub permissions..."
+    set +e
+    gh auth refresh -h github.com -s admin:public_key >/dev/null 2>&1
+    REFRESH_EXIT=$?
+    set -e
+    
+    if [ $REFRESH_EXIT -eq 0 ]; then
+        print_success "GitHub permissions updated"
+    else
+        print_warning "Could not update GitHub permissions automatically"
+        echo -e "${VIBE_CYAN}A browser window will open to grant additional permissions${NC}"
+        echo ""
+        read -p "Press Enter to continue..." < /dev/tty
+        gh auth refresh -h github.com -s admin:public_key
+    fi
 fi
 
 # Setup SSH if not properly configured
@@ -480,6 +497,27 @@ else
     ADD_KEY_OUTPUT=$(gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key" 2>&1)
     ADD_KEY_EXIT=$?
     set -e
+    
+    # If we got a permission error, try refreshing the token
+    if [ $ADD_KEY_EXIT -ne 0 ] && echo "$ADD_KEY_OUTPUT" | grep -qi "admin:public_key"; then
+        print_step "Requesting additional GitHub permissions..."
+        echo -e "${VIBE_CYAN}A browser window will open to grant SSH key permissions${NC}"
+        echo ""
+        
+        set +e
+        gh auth refresh -h github.com -s admin:public_key
+        REFRESH_EXIT=$?
+        set -e
+        
+        if [ $REFRESH_EXIT -eq 0 ]; then
+            print_success "Permissions granted, retrying..."
+            # Try adding the key again
+            set +e
+            ADD_KEY_OUTPUT=$(gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key" 2>&1)
+            ADD_KEY_EXIT=$?
+            set -e
+        fi
+    fi
     
     if [ $ADD_KEY_EXIT -eq 0 ]; then
         print_success "SSH key added to GitHub"
