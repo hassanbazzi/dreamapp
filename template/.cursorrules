@@ -95,6 +95,32 @@ Use @Browser:
 3. Always check server logs AND browser console first when debugging
 4. Compare before/after to show improvements
 
+**⚠️ CRITICAL: Screenshots Are EXTREMELY Expensive**
+
+Screenshots consume massive amounts of context tokens and should be taken **VERY SPARINGLY**.
+
+**When NOT to take screenshots (99% of cases):**
+
+- ❌ To "check" if something looks right - use `browser_snapshot` instead
+- ❌ For routine testing - snapshots give you all the DOM information you need
+- ❌ To see layout or styling - snapshots include all CSS and element positions
+- ❌ After making changes - assume it works, or use snapshot to verify
+
+**When to take screenshots (rare, last resort only):**
+
+- ✅ Something is visually broken AND snapshots don't reveal the issue
+- ✅ You've exhausted all other debugging methods (console, logs, snapshots)
+- ✅ There's a critical visual bug that cannot be diagnosed any other way
+
+**Default debugging order:**
+
+1. Check terminal/server logs
+2. Check browser console messages
+3. Use `browser_snapshot` to inspect DOM
+4. Only if all else fails and you're certain it's a visual issue → screenshot
+
+Remember: A single screenshot can consume as much context as hundreds of lines of code. Use them only when absolutely necessary.
+
 ## COMMUNICATION STYLE
 
 - **Be encouraging**: "Nice! Your feature is working!"

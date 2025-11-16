@@ -1,1381 +1,1573 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dream App - Ship production apps with AI in one command</title>
-  <meta name="description" content="From zero to deployed app in 5 minutes. One command installs everything: Next.js, Supabase, Cursor AI, and deploys to Vercel.">
-  
-  <!-- Open Graph -->
-  <meta property="og:title" content="Dream App - Ship production apps with AI in one command">
-  <meta property="og:description" content="From zero to deployed app in 5 minutes. Production-grade development environment with AI assistance.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://getdreamapp.com">
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :root {
-      --bg-primary: #fafaff;
-      --bg-secondary: #f5f5fc;
-      --bg-tertiary: #ededf8;
-      --text-primary: #2d2d3d;
-      --text-secondary: #6b6b7d;
-      --text-tertiary: #a3a3b8;
-      --accent: #8b7fd6;
-      --accent-dark: #6d5fc4;
-      --accent-light: #e8e5fb;
-      --border: #e5e5f0;
-      --code-bg: #2d2d3d;
-      --success: #22c55e;
-      --gradient-purple: linear-gradient(135deg, #9b8ee5 0%, #8b7fd6 100%);
-      --gradient-button: linear-gradient(135deg, #9b8ee5 0%, #7d6dcf 100%);
-      --shadow-sm: 0 2px 8px rgba(139, 127, 214, 0.08);
-      --shadow-md: 0 8px 24px rgba(139, 127, 214, 0.12);
-      --shadow-lg: 0 20px 48px rgba(139, 127, 214, 0.15);
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg-primary);
-      color: var(--text-primary);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    /* Container */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    .container-narrow {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-
-    /* Header */
-    header {
-      padding: 20px 0;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-      position: sticky;
-      top: 0;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      z-index: 100;
-    }
-
-    header .container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      text-decoration: none;
-    }
-
-    .logo img {
-      height: 50px;
-      width: auto;
-      display: block;
-    }
-
-    .header-links {
-      display: flex;
-      gap: 32px;
-      align-items: center;
-    }
-
-    .header-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      position: relative;
-    }
-
-    .header-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: var(--gradient-purple);
-      transition: width 0.25s ease;
-    }
-
-    .header-links a:hover {
-      color: var(--accent);
-    }
-
-    .header-links a:hover::after {
-      width: 100%;
-    }
-
-    /* Trust Badge */
-    .trust-badge {
-      padding: 16px 0;
-      background: var(--bg-secondary);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .trust-text {
-      text-align: center;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    /* Hero Section */
-    .hero {
-      padding: 80px 0 60px;
-      text-align: center;
-    }
-
-    .hero-meta {
-      margin-top: 24px;
-      font-size: 14px;
-      color: var(--text-tertiary);
-      font-weight: 500;
-    }
-
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      background: var(--accent-light);
-      border: 1.5px solid rgba(139, 127, 214, 0.2);
-      border-radius: 100px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--accent-dark);
-      margin-bottom: 28px;
-    }
-
-    .eyebrow-badge {
-      background: var(--gradient-purple);
-      color: white;
-      padding: 3px 10px;
-      border-radius: 100px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      box-shadow: 0 2px 8px rgba(139, 127, 214, 0.3);
-    }
-
-    h1 {
-      font-size: 80px;
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: -0.04em;
-      margin-bottom: 28px;
-      color: var(--text-primary);
-    }
-
-    h1 .gradient-text {
-      background: var(--gradient-purple);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero-subtitle {
-      font-size: 22px;
-      line-height: 1.5;
-      color: var(--text-secondary);
-      margin-bottom: 48px;
-      max-width: 680px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    /* CTA Buttons */
-    .cta-group {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 60px;
-    }
-
-    .btn {
-      padding: 16px 32px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 50px;
-      text-decoration: none;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      border: none;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary {
-      background: var(--gradient-button);
-      color: white;
-      box-shadow: 0 4px 16px rgba(139, 127, 214, 0.3);
-      padding-right: 28px;
-    }
-
-    .btn-primary::after {
-      content: '→';
-      font-size: 20px;
-      transition: transform 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      box-shadow: 0 6px 24px rgba(139, 127, 214, 0.4);
-      transform: translateY(-2px);
-    }
-
-    .btn-primary:hover::after {
-      transform: translateX(4px);
-    }
-
-    .btn-secondary {
-      background: white;
-      color: var(--text-primary);
-      border: 2px solid var(--border);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    }
-
-    .btn-secondary:hover {
-      background: var(--bg-secondary);
-      border-color: var(--accent);
-      box-shadow: 0 4px 12px rgba(139, 127, 214, 0.15);
-      transform: translateY(-1px);
-    }
-
-    /* Code Block */
-    .code-block {
-      background: var(--code-bg);
-      border-radius: 20px;
-      padding: 32px;
-      margin: 0 auto 40px;
-      max-width: 700px;
-      position: relative;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .code-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .code-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .code-dot:nth-child(1) { background: #ff5f56; }
-    .code-dot:nth-child(2) { background: #ffbd2e; }
-    .code-dot:nth-child(3) { background: #27c93f; }
-
-    pre {
-      margin: 0;
-      overflow-x: auto;
-    }
-
-    code {
-      font-family: 'Fira Code', 'SF Mono', Monaco, monospace;
-      font-size: 15px;
-      line-height: 1.6;
-      color: #e5e7eb;
-    }
-
-    .code-line {
-      display: block;
-    }
-
-    .code-comment {
-      color: #6b7280;
-    }
-
-    .code-command {
-      color: #34d399;
-    }
-
-    .copy-btn {
-      position: absolute;
-      top: 32px;
-      right: 32px;
-      padding: 10px 20px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1.5px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      color: white;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      backdrop-filter: blur(10px);
-    }
-
-    .copy-btn:hover {
-      background: rgba(139, 127, 214, 0.3);
-      border-color: rgba(139, 127, 214, 0.5);
-      transform: translateY(-1px);
-    }
-
-    .copy-btn.copied {
-      background: var(--success);
-      border-color: var(--success);
-    }
-
-    /* Installation Steps */
-    .install-steps {
-      max-width: 500px;
-      margin: 32px auto 0;
-      text-align: left;
-    }
-
-    .install-steps-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-      text-align: center;
-    }
-
-    .steps-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .step {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 22px;
-      background: white;
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      font-size: 15px;
-      color: var(--text-secondary);
-      font-weight: 500;
-      transition: all 0.3s ease;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-    }
-
-    .step:hover {
-      border-color: var(--accent);
-      box-shadow: var(--shadow-sm);
-      transform: translateY(-1px);
-    }
-
-    .step-number {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      background: var(--accent-light);
-      color: var(--accent-dark);
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    /* Trust Stats */
-    .trust-stats {
-      padding: 60px 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-secondary);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 48px;
-      text-align: center;
-    }
-
-    .stat-number {
-      font-size: 52px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 12px;
-      line-height: 1;
-      letter-spacing: -0.02em;
-    }
-
-    .stat-label {
-      font-size: 15px;
-      color: var(--text-secondary);
-      font-weight: 500;
-      line-height: 1.4;
-    }
-
-    /* Features Section */
-    .features {
-      padding: 120px 0;
-    }
-
-    .section-header {
-      text-align: center;
-      margin-bottom: 80px;
-    }
-
-    .section-tag {
-      color: var(--text-tertiary);
-      font-size: 13px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 20px;
-    }
-
-    .section-title {
-      font-size: 56px;
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin-bottom: 20px;
-    }
-
-    .section-subtitle {
-      font-size: 20px;
-      line-height: 1.5;
-      color: var(--text-secondary);
-      max-width: 680px;
-      margin: 0 auto;
-    }
-
-    .feature-list {
-      display: grid;
-      gap: 80px;
-    }
-
-    .feature-item {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 80px;
-      align-items: center;
-    }
-
-    .feature-item:nth-child(even) {
-      direction: rtl;
-    }
-
-    .feature-item:nth-child(even) > * {
-      direction: ltr;
-    }
-
-    .feature-content h3 {
-      font-size: 36px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      letter-spacing: -0.01em;
-      line-height: 1.2;
-    }
-
-    .feature-content p {
-      font-size: 18px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 28px;
-    }
-
-    .feature-list-items {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .feature-list-items li {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 16px;
-      color: var(--text-secondary);
-    }
-
-    .feature-list-items li::before {
-      content: "✓";
-      color: var(--success);
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    .feature-visual {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 80px 40px;
-      min-height: 280px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .feature-visual::before {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, rgba(139, 127, 214, 0.06) 0%, transparent 70%);
-      transform: translate(-50%, -50%);
-    }
-
-    .feature-icon {
-      font-size: 80px;
-      z-index: 1;
-      opacity: 0.9;
-      filter: grayscale(0.2);
-    }
-
-    /* Comparison Table */
-    .comparison {
-      padding: 120px 0;
-      background: var(--bg-secondary);
-    }
-
-    .comparison-table {
-      max-width: 900px;
-      margin: 0 auto;
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: var(--shadow-md);
-    }
-
-    .comparison-table table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .comparison-table thead {
-      background: var(--bg-tertiary);
-    }
-
-    .comparison-table th {
-      padding: 20px 24px;
-      text-align: left;
-      font-weight: 700;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-    }
-
-    .comparison-table td {
-      padding: 20px 24px;
-      border-top: 1px solid var(--border);
-      font-size: 15px;
-      color: var(--text-secondary);
-    }
-
-    .comparison-table td:first-child {
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .check {
-      color: var(--success);
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    .cross {
-      color: var(--text-tertiary);
-      font-weight: 700;
-      font-size: 18px;
-    }
-
-    /* Social Proof */
-    .social-proof {
-      padding: 120px 0;
-      background: var(--bg-primary);
-    }
-
-    .testimonial {
-      max-width: 760px;
-      margin: 0 auto;
-      text-align: center;
-      padding: 48px;
-      background: white;
-      border-radius: 24px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-md);
-    }
-
-    .testimonial-quote {
-      font-size: 22px;
-      line-height: 1.6;
-      color: var(--text-primary);
-      margin-bottom: 32px;
-      font-weight: 500;
-    }
-
-    .testimonial-author {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-    }
-
-    .testimonial-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: var(--gradient-button);
-    }
-
-    .testimonial-info {
-      text-align: left;
-    }
-
-    .testimonial-name {
-      font-weight: 600;
-      margin-bottom: 4px;
-      font-size: 15px;
-    }
-
-    .testimonial-role {
-      font-size: 14px;
-      color: var(--text-secondary);
-    }
-
-    /* FAQ Section */
-    .faq {
-      padding: 120px 0;
-      background: var(--bg-secondary);
-    }
-
-    .faq-list {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .faq-item {
-      background: white;
-      border: 1.5px solid var(--border);
-      border-radius: 16px;
-      margin-bottom: 12px;
-      overflow: hidden;
-      transition: all 0.25s ease;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-    }
-
-    .faq-item:hover {
-      border-color: var(--accent);
-      box-shadow: var(--shadow-sm);
-      transform: translateY(-1px);
-    }
-
-    .faq-question {
-      width: 100%;
-      padding: 24px 28px;
-      text-align: left;
-      background: none;
-      border: none;
-      font-size: 17px;
-      font-weight: 600;
-      color: var(--text-primary);
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.2s;
-    }
-
-    .faq-question:hover {
-      color: var(--accent);
-    }
-
-    .faq-icon {
-      color: var(--text-tertiary);
-      transition: transform 0.3s;
-    }
-
-    .faq-item.active .faq-icon {
-      transform: rotate(180deg);
-    }
-
-    .faq-answer {
-      padding: 0 24px;
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s, padding 0.3s;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    .faq-item.active .faq-answer {
-      padding: 0 24px 24px;
-      max-height: 500px;
-    }
-
-    /* Final CTA */
-    .final-cta {
-      padding: 120px 0;
-      background: var(--bg-secondary);
-      text-align: center;
-      border-top: 1px solid var(--border);
-    }
-
-    .final-cta h2 {
-      font-size: 56px;
-      font-weight: 700;
-      margin-bottom: 24px;
-      letter-spacing: -0.02em;
-    }
-
-    .final-cta p {
-      font-size: 20px;
-      margin-bottom: 48px;
-      color: var(--text-secondary);
-    }
-
-    .final-cta .btn-primary {
-      padding: 18px 40px;
-      font-size: 17px;
-    }
-
-    /* Footer */
-    footer {
-      padding: 60px 0;
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-
-    footer p {
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-
-    footer a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 48px;
-        line-height: 1.05;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dream App - Ship production apps with AI in one command</title>
+    <meta
+      name="description"
+      content="From zero to deployed app in 5 minutes. One command installs everything: Next.js, Supabase, Cursor AI, and deploys to Vercel."
+    />
+
+    <!-- Open Graph -->
+    <meta
+      property="og:title"
+      content="Dream App - Ship production apps with AI in one command"
+    />
+    <meta
+      property="og:description"
+      content="From zero to deployed app in 5 minutes. Production-grade development environment with AI assistance."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://getdreamapp.com" />
+
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Dark Mode Initialization - runs before page renders -->
+    <script>
+      ;(function () {
+        const darkModeEnabled = localStorage.getItem("darkMode") === "true"
+        if (darkModeEnabled) {
+          document.documentElement.classList.add("dark-mode-init")
+        }
+      })()
+    </script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
 
-      .hero {
-        padding: 60px 0 40px;
+      .cursive-font {
+        font-family: "Pacifico", cursive;
+        font-weight: 400;
+        font-style: normal;
       }
 
-      .hero-subtitle {
-        font-size: 19px;
+      :root {
+        --bg-primary: #fafaff;
+        --bg-secondary: #f5f5fc;
+        --bg-tertiary: #ededf8;
+        --text-primary: #2d2d3d;
+        --text-secondary: #6b6b7d;
+        --text-tertiary: #a3a3b8;
+        --accent: #8b7fd6;
+        --accent-dark: #6d5fc4;
+        --accent-light: #e8e5fb;
+        --border: #e5e5f0;
+        --code-bg: #2d2d3d;
+        --success: #22c55e;
+        --gradient-purple: linear-gradient(135deg, #9b8ee5 0%, #8b7fd6 100%);
+        --gradient-button: linear-gradient(135deg, #9b8ee5 0%, #7d6dcf 100%);
+        --shadow-sm: 0 2px 8px rgba(139, 127, 214, 0.08);
+        --shadow-md: 0 8px 24px rgba(139, 127, 214, 0.12);
+        --shadow-lg: 0 20px 48px rgba(139, 127, 214, 0.15);
       }
 
-      .install-steps {
-        max-width: 100%;
-        margin-top: 24px;
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, sans-serif;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        line-height: 1.6;
+        overflow-x: hidden;
+        position: relative;
       }
 
-      .step {
-        font-size: 14px;
-        padding: 12px 16px;
+      /* Dark Mode Overlay */
+      .dark-mode-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        mix-blend-mode: difference;
+        pointer-events: none;
+        z-index: 9999;
+        clip-path: circle(0% at 60px calc(100vh - 60px));
+        transition: clip-path 0.8s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      .section-title {
-        font-size: 40px;
+      body.dark-mode .dark-mode-overlay {
+        clip-path: circle(150% at 60px calc(100vh - 60px));
       }
 
-      .section-subtitle {
-        font-size: 18px;
+      /* Apply dark mode immediately on page load without animation */
+      html.dark-mode-init body .dark-mode-overlay {
+        clip-path: circle(150% at 60px calc(100vh - 60px));
+        transition: none;
       }
 
-      .final-cta h2 {
-        font-size: 40px;
+      /* Invert images and videos back in dark mode */
+      body.dark-mode img:not(.no-invert),
+      body.dark-mode video,
+      html.dark-mode-init body img:not(.no-invert),
+      html.dark-mode-init body video {
+        filter: invert(1);
       }
 
-      .btn {
-        padding: 14px 28px;
+      /* Don't invert feature images - they're design assets */
+      body.dark-mode .feature-visual img,
+      html.dark-mode-init body .feature-visual img {
+        filter: none;
+      }
+
+      /* Dark Mode Toggle Button */
+      .dark-mode-toggle {
+        position: fixed;
+        bottom: 32px;
+        left: 32px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: var(--gradient-button);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 4px 16px rgba(139, 127, 214, 0.3);
+        transition: all 0.3s ease;
+        z-index: 1000;
+      }
+
+      .dark-mode-toggle:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(139, 127, 214, 0.4);
+      }
+
+      .dark-mode-toggle:active {
+        transform: scale(0.95);
+      }
+
+      /* Container */
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .container-narrow {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* Header */
+      header {
+        padding: 20px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        position: sticky;
+        top: 0;
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(20px);
+        z-index: 100;
+      }
+
+      header .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        font-family: "Pacifico", cursive;
+        font-size: 32px;
+        color: var(--accent);
+        font-weight: 400;
+      }
+
+      .header-links {
+        display: flex;
+        gap: 32px;
+        align-items: center;
+      }
+
+      .header-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
         font-size: 15px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        position: relative;
       }
 
-      .stat-number {
-        font-size: 44px;
+      .header-links a::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--gradient-purple);
+        transition: width 0.25s ease;
+      }
+
+      .header-links a:hover {
+        color: var(--accent);
+      }
+
+      .header-links a:hover::after {
+        width: 100%;
+      }
+
+      /* Trust Badge */
+      .trust-badge {
+        padding: 16px 0;
+        background: var(--bg-secondary);
+        border-bottom: 1px solid var(--border);
       }
 
       .trust-text {
-        font-size: 12px;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
 
-      .feature-visual {
-        padding: 60px 40px;
-        min-height: 240px;
+      /* Hero Section */
+      .hero {
+        padding: 80px 0 60px;
+        text-align: center;
       }
 
-      .feature-icon {
-        font-size: 64px;
+      .hero-meta {
+        margin-top: 24px;
+        font-size: 14px;
+        color: var(--text-tertiary);
+        font-weight: 500;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: var(--accent-light);
+        border: 1.5px solid rgba(139, 127, 214, 0.2);
+        border-radius: 100px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--accent-dark);
+        margin-bottom: 28px;
+      }
+
+      .eyebrow-badge {
+        background: var(--gradient-purple);
+        color: white;
+        padding: 3px 10px;
+        border-radius: 100px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        box-shadow: 0 2px 8px rgba(139, 127, 214, 0.3);
+      }
+
+      h1 {
+        font-size: 80px;
+        font-weight: 700;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        margin-bottom: 28px;
+        color: var(--text-primary);
+      }
+
+      h1 .gradient-text {
+        background: var(--gradient-purple);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero-subtitle {
+        font-size: 22px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+        margin-bottom: 48px;
+        max-width: 680px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* CTA Buttons */
+      .cta-group {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 60px;
+      }
+
+      .btn {
+        padding: 16px 32px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary {
+        background: var(--gradient-button);
+        color: white;
+        box-shadow: 0 4px 16px rgba(139, 127, 214, 0.3);
+        padding-right: 28px;
+      }
+
+      .btn-primary::after {
+        content: "→";
+        font-size: 20px;
+        transition: transform 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        box-shadow: 0 6px 24px rgba(139, 127, 214, 0.4);
+        transform: translateY(-2px);
+      }
+
+      .btn-primary:hover::after {
+        transform: translateX(4px);
+      }
+
+      .btn-secondary {
+        background: white;
+        color: var(--text-primary);
+        border: 2px solid var(--border);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      }
+
+      .btn-secondary:hover {
+        background: var(--bg-secondary);
+        border-color: var(--accent);
+        box-shadow: 0 4px 12px rgba(139, 127, 214, 0.15);
+        transform: translateY(-1px);
+      }
+
+      /* Code Block */
+      .code-block {
+        background: var(--code-bg);
+        border-radius: 20px;
+        padding: 32px;
+        margin: 0 auto 40px;
+        max-width: 700px;
+        position: relative;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      .code-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+
+      .code-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      .code-dot:nth-child(1) {
+        background: #ff5f56;
+      }
+      .code-dot:nth-child(2) {
+        background: #ffbd2e;
+      }
+      .code-dot:nth-child(3) {
+        background: #27c93f;
+      }
+
+      pre {
+        margin: 0;
+        overflow-x: auto;
+      }
+
+      code {
+        font-family: "Fira Code", "SF Mono", Monaco, monospace;
+        font-size: 15px;
+        line-height: 1.6;
+        color: #e5e7eb;
+      }
+
+      .code-line {
+        display: block;
+      }
+
+      .code-comment {
+        color: #6b7280;
+      }
+
+      .code-command {
+        color: #34d399;
+      }
+
+      .copy-btn {
+        position: absolute;
+        top: 32px;
+        right: 32px;
+        padding: 10px 20px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1.5px solid rgba(255, 255, 255, 0.12);
+        border-radius: 12px;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+      }
+
+      .copy-btn:hover {
+        background: rgba(139, 127, 214, 0.3);
+        border-color: rgba(139, 127, 214, 0.5);
+        transform: translateY(-1px);
+      }
+
+      .copy-btn.copied {
+        background: var(--success);
+        border-color: var(--success);
+      }
+
+      /* Installation Steps */
+      .install-steps {
+        max-width: 500px;
+        margin: 32px auto 0;
+        text-align: left;
+      }
+
+      .install-steps-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+        text-align: center;
+      }
+
+      .steps-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .step {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 18px 22px;
+        background: white;
+        border: 1.5px solid var(--border);
+        border-radius: 14px;
+        font-size: 15px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+      }
+
+      .step:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-1px);
+      }
+
+      .step-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background: var(--accent-light);
+        color: var(--accent-dark);
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      /* Trust Stats */
+      .trust-stats {
+        padding: 60px 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        background: var(--bg-secondary);
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 48px;
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 52px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+        line-height: 1;
+        letter-spacing: -0.02em;
+      }
+
+      .stat-label {
+        font-size: 15px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        line-height: 1.4;
+      }
+
+      /* Features Section */
+      .features {
+        padding: 120px 0;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 80px;
+      }
+
+      .section-tag {
+        color: var(--text-tertiary);
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 20px;
+      }
+
+      .section-title {
+        font-family: "Pacifico", cursive;
+        font-size: 56px;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: 20px;
+      }
+
+      .section-subtitle {
+        font-size: 20px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+        max-width: 680px;
+        margin: 0 auto;
+      }
+
+      .feature-list {
+        display: grid;
+        gap: 80px;
       }
 
       .feature-item {
-        grid-template-columns: 1fr;
-        gap: 40px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: center;
       }
 
       .feature-item:nth-child(even) {
+        direction: rtl;
+      }
+
+      .feature-item:nth-child(even) > * {
         direction: ltr;
       }
 
       .feature-content h3 {
-        font-size: 28px;
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
       }
 
       .feature-content p {
-        font-size: 17px;
+        font-size: 18px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 28px;
+      }
+
+      .feature-list-items {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .feature-list-items li {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 16px;
+        color: var(--text-secondary);
+      }
+
+      .feature-list-items li::before {
+        content: "✓";
+        color: var(--success);
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .feature-visual {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 80px 40px;
+        min-height: 280px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+      }
+
+      .feature-visual::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(
+          circle,
+          rgba(139, 127, 214, 0.06) 0%,
+          transparent 70%
+        );
+        transform: translate(-50%, -50%);
+      }
+
+      .feature-icon {
+        font-size: 80px;
+        z-index: 1;
+        opacity: 0.9;
+        filter: grayscale(0.2);
+      }
+
+      .feature-visual img {
+        max-width: 100%;
+        width: auto;
+        height: auto;
+        z-index: 1;
+        position: relative;
+        object-fit: contain;
+      }
+
+      /* First feature visual - floating image without container styling */
+      .feature-item .feature-visual {
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+      }
+
+      /* Comparison Table */
+      .comparison {
+        padding: 120px 0;
+        background: var(--bg-secondary);
+      }
+
+      .comparison-table {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+      }
+
+      .comparison-table table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .comparison-table thead {
+        background: var(--bg-tertiary);
+      }
+
+      .comparison-table th {
+        padding: 20px 24px;
+        text-align: left;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-secondary);
+      }
+
+      .comparison-table td {
+        padding: 20px 24px;
+        border-top: 1px solid var(--border);
+        font-size: 15px;
+        color: var(--text-secondary);
+      }
+
+      .comparison-table td:first-child {
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .check {
+        color: var(--success);
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .cross {
+        color: var(--text-tertiary);
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      /* Social Proof */
+      .social-proof {
+        padding: 120px 0;
+        background: var(--bg-primary);
       }
 
       .testimonial {
-        padding: 32px 24px;
+        max-width: 760px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 48px;
+        background: white;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-md);
       }
 
       .testimonial-quote {
-        font-size: 19px;
+        font-size: 22px;
+        line-height: 1.6;
+        color: var(--text-primary);
+        margin-bottom: 32px;
+        font-weight: 200;
       }
 
-      .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 32px;
+      .testimonial-author {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
       }
 
-      .code-block {
-        padding: 24px;
+      .testimonial-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        background: var(--gradient-button);
       }
 
-      .copy-btn {
-        top: 24px;
-        right: 24px;
+      .testimonial-info {
+        text-align: center;
       }
 
-      code {
-        font-size: 13px;
+      .testimonial-name {
+        font-weight: 600;
+        margin-bottom: 4px;
+        font-size: 15px;
       }
 
-      .header-links {
-        gap: 20px;
+      .testimonial-role {
+        font-size: 14px;
+        color: var(--text-secondary);
       }
 
-      .header-links a {
-        font-size: 13px;
+      /* FAQ Section */
+      .faq {
+        padding: 120px 0;
+        background: var(--bg-secondary);
       }
-    }
-  </style>
-</head>
-<body>
 
-  <!-- Header -->
-  <header>
-    <div class="container">
-      <a href="/" class="logo">
-        <img src="logo.png" alt="Dream App">
-      </a>
-      <nav class="header-links">
-        <a href="https://github.com/hassanbazzi/dreamapp">GitHub</a>
-        <a href="https://github.com/hassanbazzi/dreamapp#readme">Docs</a>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Trust Badge -->
-  <section class="trust-badge">
-    <div class="container">
-      <p class="trust-text">Used by creators who want to build without limits</p>
-    </div>
-  </section>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="container-narrow">
-      <h1>Build real apps <span class="gradient-text">without any code</span></h1>
-      
-      <p class="hero-subtitle">
-        Dream App plugs into your Mac, so you can ditch months of learning and focus on building. 
-        Your ideas deserve to exist.
-      </p>
-
-      <div class="cta-group">
-        <a href="#install" class="btn btn-primary">
-          Get Started for Free
-        </a>
-        <a href="https://github.com/hassanbazzi/dreamapp" class="btn btn-secondary">
-          View on GitHub
-        </a>
-      </div>
-
-      <p class="hero-meta">5 min setup • Free forever • Mac only</p>
-
-      <!-- Code Block -->
-      <div class="code-block" id="install">
-        <div class="code-header">
-          <div class="code-dot"></div>
-          <div class="code-dot"></div>
-          <div class="code-dot"></div>
-        </div>
-        <pre><code><span class="code-comment"># Copy this command</span>
-<span class="code-command">curl -fsSL https://raw.githubusercontent.com/hassanbazzi/dreamapp/main/install.sh | bash</span></code></pre>
-        <button class="copy-btn" onclick="copyInstallCommand()">Copy</button>
-      </div>
-
-      <!-- Installation Steps -->
-      <div class="install-steps">
-        <div class="install-steps-title">How to run this:</div>
-        <div class="steps-list">
-          <div class="step">
-            <span class="step-number">1</span>
-            <span>Press <strong>⌘ Space</strong> to open Spotlight</span>
-          </div>
-          <div class="step">
-            <span class="step-number">2</span>
-            <span>Type <strong>"Terminal"</strong> and press Enter</span>
-          </div>
-          <div class="step">
-            <span class="step-number">3</span>
-            <span>Click the <strong>Copy</strong> button above</span>
-          </div>
-          <div class="step">
-            <span class="step-number">4</span>
-            <span>Paste (<strong>⌘ V</strong>) and press <strong>Enter</strong></span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Trust Stats -->
-  <section class="trust-stats">
-    <div class="container">
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-number">~5min</div>
-          <div class="stat-label">From zero to live app</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">1</div>
-          <div class="stat-label">Command to run</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">$0</div>
-          <div class="stat-label">Completely free to start</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">0</div>
-          <div class="stat-label">Coding experience needed</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Features Section -->
-  <section class="features">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-tag">How It Works</div>
-        <h2 class="section-title">From zero to deployed in minutes</h2>
-        <p class="section-subtitle">
-          Dream App handles the boring setup, so you can focus on building. 
-          No technical knowledge required. Just describe what you want and watch it come to life.
-        </p>
-      </div>
-
-      <div class="feature-list">
-        <!-- Feature 1 -->
-        <div class="feature-item">
-          <div class="feature-content">
-            <h3>Everything set up for you, automatically</h3>
-            <p>
-              Run one command and watch the magic happen. All the complicated stuff installs itself, 
-              your app goes live on the internet, and everything opens ready for you to start creating.
-            </p>
-            <ul class="feature-list-items">
-              <li>No technical setup required</li>
-              <li>Your app is live in minutes</li>
-              <li>Nothing to configure manually</li>
-              <li>Works on any Mac</li>
-            </ul>
-          </div>
-          <div class="feature-visual">
-            <div class="feature-icon">⚡</div>
-          </div>
-        </div>
-
-        <!-- Feature 2 -->
-        <div class="feature-item">
-          <div class="feature-content">
-            <h3>Just describe what you want</h3>
-            <p>
-              "Add a page where users can upload photos." "Make the homepage prettier." "Add a dark mode button."
-              The AI understands plain English and builds it for you, then tests it to make sure it works.
-            </p>
-            <ul class="feature-list-items">
-              <li>Talk to it like a person</li>
-              <li>Watch it build in real-time</li>
-              <li>See your changes instantly</li>
-              <li>It explains what it's doing</li>
-            </ul>
-          </div>
-          <div class="feature-visual">
-            <div class="feature-icon">🤖</div>
-          </div>
-        </div>
-
-        <!-- Feature 3 -->
-        <div class="feature-item">
-          <div class="feature-content">
-            <h3>Real apps, not toys</h3>
-            <p>
-              This isn't a prototype or demo. Your app has a real database, can handle users logging in, 
-              and is live on the internet instantly. It actually works, and it scales as you grow.
-            </p>
-            <ul class="feature-list-items">
-              <li>Built with professional tools</li>
-              <li>Stores data properly</li>
-              <li>User accounts included</li>
-              <li>Fast for everyone, everywhere</li>
-            </ul>
-          </div>
-          <div class="feature-visual">
-            <div class="feature-icon">🚀</div>
-          </div>
-        </div>
-
-        <!-- Feature 4 -->
-        <div class="feature-item">
-          <div class="feature-content">
-            <h3>Everything in one place</h3>
-            <p>
-              No switching between 10 different apps or tabs. Everything you need is right there: 
-              chat with the AI, see your app update live, and share it with the world. Simple.
-            </p>
-            <ul class="feature-list-items">
-              <li>See changes instantly</li>
-              <li>No confusing setup steps</li>
-              <li>One window, everything works</li>
-              <li>Actually feels magical</li>
-            </ul>
-          </div>
-          <div class="feature-visual">
-            <div class="feature-icon">✨</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Comparison -->
-  <section class="comparison">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-tag">Stay Ahead</div>
-        <h2 class="section-title">Build smarter, not harder</h2>
-        <p class="section-subtitle">
-          Dream App gives you the simplicity of no-code with none of the limitations. 
-          Compare how your workflow transforms when you choose the right tool.
-        </p>
-      </div>
-
-      <div class="comparison-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Feature</th>
-              <th>Dream App</th>
-              <th>No-Code Platforms</th>
-              <th>Learning to Code</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Setup time</td>
-              <td><span class="check">✓</span> 5 minutes</td>
-              <td><span class="check">✓</span> 5 minutes</td>
-              <td><span class="cross">✗</span> Months to learn</td>
-            </tr>
-            <tr>
-              <td>Works for simple ideas</td>
-              <td><span class="check">✓</span></td>
-              <td><span class="check">✓</span></td>
-              <td><span class="check">✓</span> Eventually</td>
-            </tr>
-            <tr>
-              <td>Handles complexity</td>
-              <td><span class="check">✓</span> Gets better over time</td>
-              <td><span class="cross">✗</span> Breaks when complex</td>
-              <td><span class="check">✓</span></td>
-            </tr>
-            <tr>
-              <td>You own everything</td>
-              <td><span class="check">✓</span></td>
-              <td><span class="cross">✗</span> Locked in</td>
-              <td><span class="check">✓</span></td>
-            </tr>
-            <tr>
-              <td>Can build anything</td>
-              <td><span class="check">✓</span></td>
-              <td><span class="cross">✗</span> Template limits</td>
-              <td><span class="check">✓</span></td>
-            </tr>
-            <tr>
-              <td>AI helps you build</td>
-              <td><span class="check">✓</span> Personalized</td>
-              <td><span class="check">✓</span> Generic</td>
-              <td><span class="cross">✗</span> On your own</td>
-            </tr>
-            <tr>
-              <td>Easy for beginners</td>
-              <td><span class="check">✓</span></td>
-              <td><span class="check">✓</span></td>
-              <td><span class="cross">✗</span></td>
-            </tr>
-            <tr>
-              <td>Coding knowledge</td>
-              <td><span class="check">✓</span> None needed</td>
-              <td><span class="check">✓</span> None needed</td>
-              <td><span class="cross">✗</span> Required</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- Social Proof -->
-  <section class="social-proof">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-tag">Real Results</div>
-        <h2 class="section-title">It works</h2>
-      </div>
-
-      <div class="testimonial">
-        <p class="testimonial-quote">
-          I watched someone with zero coding experience ship a working app in 2 days. 
-          She just talked to the AI like a person and it built everything. That's when I realized 
-          this needs to be available to everyone.
-        </p>
-        <div class="testimonial-author">
-          <div class="testimonial-avatar"></div>
-          <div class="testimonial-info">
-            <div class="testimonial-name">Hassan Bazzi</div>
-            <div class="testimonial-role">Creator of Dream App</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="faq">
-    <div class="container">
-      <div class="section-header">
-        <div class="section-tag">FAQ</div>
-        <h2 class="section-title">What's often asked about Dream App</h2>
-      </div>
-
-      <div class="faq-list">
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            <span>Do I need to know how to code?</span>
-            <span class="faq-icon">▼</span>
-          </button>
-          <div class="faq-answer">
-            Not at all. Dream App is designed for complete beginners. You describe what you want in plain English, 
-            and the AI builds it for you. You'll learn as you go, but no prior experience is required.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            <span>What's included in the installation?</span>
-            <span class="faq-icon">▼</span>
-          </button>
-          <div class="faq-answer">
-            Everything you need: the AI editor, tools to make your app work, a place to store data, 
-            user login features, and your app goes live on the internet. All installed and set up automatically.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            <span>Is it really free?</span>
-            <span class="faq-icon">▼</span>
-          </button>
-          <div class="faq-answer">
-            Yes! Dream App is completely free. All the services it uses have generous free tiers 
-            that are perfect for getting started. You can build and launch your app without spending anything.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            <span>Does this work on Windows?</span>
-            <span class="faq-icon">▼</span>
-          </button>
-          <div class="faq-answer">
-            Right now it's Mac only, but Windows and Linux support are coming soon! 
-            If you're on Windows, hang tight—we're working on making it just as easy for you.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            <span>Can I use this to build a real business?</span>
-            <span class="faq-icon">▼</span>
-          </button>
-          <div class="faq-answer">
-            Absolutely. This isn't a toy or demo. Your app is built with the same professional tools 
-            that real startups and companies use. It can handle real users, real payments, and real growth. 
-            Many successful companies run on this exact setup.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            <span>Do I own everything I build?</span>
-            <span class="faq-icon">▼</span>
-          </button>
-          <div class="faq-answer">
-            Yes, 100%. Everything is saved under your account. Your app, your data, your users. 
-            You can modify it, grow it, or even sell it. No lock-in, no restrictions. It's completely yours.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            <span>How long does setup take?</span>
-            <span class="faq-icon">▼</span>
-          </button>
-          <div class="faq-answer">
-            About 5 minutes total. Most of that is just waiting for things to download and set up automatically. 
-            You'll answer a couple simple questions, but it's all straightforward. Then you're ready to build.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <button class="faq-question" onclick="toggleFaq(this)">
-            <span>What if something goes wrong?</span>
-            <span class="faq-icon">▼</span>
-          </button>
-          <div class="faq-answer">
-            The installer tries to explain what's happening in plain English and will tell you exactly what went wrong. 
-            If you get stuck, check the troubleshooting guide on GitHub or ask for help. 
-            The community is friendly and there to help you out!
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Final CTA -->
-  <section class="final-cta">
-    <div class="container-narrow">
-      <h2>Ready to build?</h2>
-      <p>If you're looking to turn ideas into apps fast, Dream App is here for you.</p>
-      <a href="#install" class="btn btn-primary">
-        Get Dream App - it's Free
-      </a>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <div class="container">
-      <p>
-        Built with ❤️ by <a href="https://github.com/hassanbazzi">Hassan Bazzi</a> • 
-        <a href="https://github.com/hassanbazzi/dreamapp">Open Source</a> • 
-        <a href="https://github.com/hassanbazzi/dreamapp/blob/main/LICENSE">MIT License</a>
-      </p>
-    </div>
-  </footer>
-
-  <script>
-    // Copy install command
-    function copyInstallCommand() {
-      const command = 'curl -fsSL https://raw.githubusercontent.com/hassanbazzi/dreamapp/main/install.sh | bash';
-      navigator.clipboard.writeText(command).then(() => {
-        const btn = document.querySelector('.copy-btn');
-        const originalText = btn.textContent;
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = originalText;
-          btn.classList.remove('copied');
-        }, 2000);
-      });
-    }
-
-    // FAQ toggle
-    function toggleFaq(button) {
-      const item = button.parentElement;
-      const wasActive = item.classList.contains('active');
-      
-      // Close all items
-      document.querySelectorAll('.faq-item').forEach(faq => {
-        faq.classList.remove('active');
-      });
-      
-      // Open clicked item if it wasn't active
-      if (!wasActive) {
-        item.classList.add('active');
+      .faq-list {
+        max-width: 800px;
+        margin: 0 auto;
       }
-    }
 
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
+      .faq-item {
+        background: white;
+        border: 1.5px solid var(--border);
+        border-radius: 16px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        transition: all 0.25s ease;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+      }
+
+      .faq-item:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-1px);
+      }
+
+      .faq-question {
+        width: 100%;
+        padding: 24px 28px;
+        text-align: left;
+        background: none;
+        border: none;
+        font-size: 17px;
+        font-weight: 600;
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s;
+      }
+
+      .faq-question:hover {
+        color: var(--accent);
+      }
+
+      .faq-icon {
+        color: var(--text-tertiary);
+        transition: transform 0.3s;
+      }
+
+      .faq-item.active .faq-icon {
+        transform: rotate(180deg);
+      }
+
+      .faq-answer {
+        padding: 0 24px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s, padding 0.3s;
+        color: var(--text-secondary);
+        line-height: 1.7;
+      }
+
+      .faq-item.active .faq-answer {
+        padding: 0 24px 24px;
+        max-height: 500px;
+      }
+
+      /* Final CTA */
+      .final-cta {
+        padding: 120px 0;
+        background: var(--bg-secondary);
+        text-align: center;
+        border-top: 1px solid var(--border);
+      }
+
+      .final-cta h2 {
+        font-size: 56px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        letter-spacing: -0.02em;
+      }
+
+      .final-cta p {
+        font-size: 20px;
+        margin-bottom: 48px;
+        color: var(--text-secondary);
+      }
+
+      .final-cta .btn-primary {
+        padding: 18px 40px;
+        font-size: 17px;
+      }
+
+      /* Footer */
+      footer {
+        padding: 60px 0;
+        border-top: 1px solid var(--border);
+        text-align: center;
+      }
+
+      footer p {
+        color: var(--text-secondary);
+        font-size: 14px;
+      }
+
+      footer a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .dark-mode-toggle {
+          bottom: 24px;
+          left: 24px;
+          width: 48px;
+          height: 48px;
+          font-size: 20px;
         }
-      });
-    });
-  </script>
 
-</body>
+        .dark-mode-overlay {
+          clip-path: circle(0% at 48px calc(100vh - 48px));
+        }
+
+        body.dark-mode .dark-mode-overlay {
+          clip-path: circle(150% at 48px calc(100vh - 48px));
+        }
+
+        html.dark-mode-init body .dark-mode-overlay {
+          clip-path: circle(150% at 48px calc(100vh - 48px));
+          transition: none;
+        }
+
+        h1 {
+          font-size: 48px;
+          line-height: 1.05;
+        }
+
+        .hero {
+          padding: 60px 0 40px;
+        }
+
+        .hero-subtitle {
+          font-size: 19px;
+        }
+
+        .install-steps {
+          max-width: 100%;
+          margin-top: 24px;
+        }
+
+        .step {
+          font-size: 14px;
+          padding: 12px 16px;
+        }
+
+        .section-title {
+          font-size: 40px;
+        }
+
+        .section-subtitle {
+          font-size: 18px;
+        }
+
+        .final-cta h2 {
+          font-size: 40px;
+        }
+
+        .btn {
+          padding: 14px 28px;
+          font-size: 15px;
+        }
+
+        .stat-number {
+          font-size: 44px;
+        }
+
+        .trust-text {
+          font-size: 12px;
+        }
+
+        .feature-visual {
+          padding: 60px 40px;
+          min-height: 240px;
+        }
+
+        .feature-item:first-child .feature-visual {
+          padding: 0;
+          min-height: auto;
+        }
+
+        .feature-visual img {
+          max-height: 280px;
+        }
+
+        .feature-icon {
+          font-size: 64px;
+        }
+
+        .feature-item {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+
+        .feature-item:nth-child(even) {
+          direction: ltr;
+        }
+
+        .feature-content h3 {
+          font-size: 28px;
+        }
+
+        .feature-content p {
+          font-size: 17px;
+        }
+
+        .testimonial {
+          padding: 32px 24px;
+        }
+
+        .testimonial-quote {
+          font-size: 19px;
+        }
+
+        .stats-grid {
+          grid-template-columns: 1fr;
+          gap: 32px;
+        }
+
+        .code-block {
+          padding: 24px;
+        }
+
+        .copy-btn {
+          top: 24px;
+          right: 24px;
+        }
+
+        code {
+          font-size: 13px;
+        }
+
+        .header-links {
+          gap: 20px;
+        }
+
+        .header-links a {
+          font-size: 13px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Dark Mode Overlay -->
+    <div class="dark-mode-overlay"></div>
+
+    <!-- Dark Mode Toggle Button -->
+    <button
+      class="dark-mode-toggle"
+      onclick="toggleDarkMode()"
+      aria-label="Toggle dark mode"
+    >
+      <span id="dark-mode-icon">☀️</span>
+    </button>
+
+    <!-- Header -->
+    <header>
+      <div class="container">
+        <a href="/" class="logo"> Dream App </a>
+        <nav class="header-links">
+          <a href="https://github.com/hassanbazzi/dreamapp">GitHub</a>
+          <a href="https://github.com/hassanbazzi/dreamapp#readme">Docs</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Trust Badge -->
+    <section class="trust-badge">
+      <div class="container">
+        <p class="trust-text">Made with ❤️ so kids can build without limits</p>
+      </div>
+    </section>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container-narrow overflow-visible">
+        <h1>
+          Build <span class="gradient-text">real apps</span>
+          <span class="cursive-font">without any code</span>
+        </h1>
+
+        <div class="cta-group">
+          <a href="#install" class="btn btn-primary"> Get Started for Free </a>
+          <a
+            href="https://github.com/hassanbazzi/dreamapp"
+            class="btn btn-secondary"
+          >
+            View on GitHub
+          </a>
+        </div>
+
+        <!-- Code Block -->
+        <div class="code-block" id="install">
+          <div class="code-header">
+            <div class="code-dot"></div>
+            <div class="code-dot"></div>
+            <div class="code-dot"></div>
+          </div>
+          <pre><code><span class="code-comment"># Copy this command</span>
+<span class="code-command">curl -fsSL https://getdreamapp.com/install | bash</span></code></pre>
+          <button class="copy-btn" onclick="copyInstallCommand()">Copy</button>
+        </div>
+
+        <!-- Installation Steps -->
+        <div class="install-steps">
+          <div class="install-steps-title">How to run this:</div>
+          <div class="steps-list">
+            <div class="step">
+              <span class="step-number">1</span>
+              <span>Press <strong>⌘ Space</strong> to open Spotlight</span>
+            </div>
+            <div class="step">
+              <span class="step-number">2</span>
+              <span>Type <strong>"Terminal"</strong> and press Enter</span>
+            </div>
+            <div class="step">
+              <span class="step-number">3</span>
+              <span>Click the <strong>Copy</strong> button above</span>
+            </div>
+            <div class="step">
+              <span class="step-number">4</span>
+              <span
+                >Paste (<strong>⌘ V</strong>) and press
+                <strong>Enter</strong></span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Trust Stats -->
+    <section class="trust-stats">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-number">~5min</div>
+            <div class="stat-label">From zero to live app</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">1</div>
+            <div class="stat-label">Command to run</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">$0</div>
+            <div class="stat-label">Completely free forever</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Coding experience needed</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">How It Works</div>
+          <h2 class="section-title">From zero to app in minutes</h2>
+          <p class="section-subtitle">
+            Dream App handles the boring setup, so you can focus on building. No
+            technical knowledge required. Just describe what you want and watch
+            it come to life.
+          </p>
+        </div>
+
+        <div class="feature-list">
+          <!-- Feature 1 -->
+          <div class="feature-item">
+            <div class="feature-content">
+              <h3>
+                Everything set up for you, automatically, to build real apps,
+                not toys
+              </h3>
+              <p>
+                Run one command and watch the magic happen. All the complicated
+                stuff installs itself, your app goes live on the internet, and
+                everything opens ready for you to start creating.
+              </p>
+              <ul class="feature-list-items">
+                <li>No technical setup required</li>
+                <li>Built with professional tools</li>
+                <li>Builds complex user journeys</li>
+              </ul>
+            </div>
+            <div class="feature-visual">
+              <img
+                src="tooling.png"
+                alt="Development environment with AI tools"
+              />
+            </div>
+          </div>
+
+          <!-- Feature 2 -->
+          <div class="feature-item">
+            <div class="feature-content">
+              <h3>Just describe what you want</h3>
+              <p>
+                "Add a page where users can upload photos." "Make the homepage
+                prettier." "Add a dark mode button." The AI understands plain
+                English and builds it for you, then tests it to make sure it
+                works.
+              </p>
+              <ul class="feature-list-items">
+                <li>Talk to it like a person</li>
+                <li>Watch it build in real-time</li>
+                <li>See your changes instantly</li>
+                <li>It explains what it's doing</li>
+              </ul>
+            </div>
+            <div class="feature-visual">
+              <img src="build.png" alt="Building an app with the AI" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Comparison -->
+    <section class="comparison">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-tag">Stay Ahead</div>
+          <h2 class="section-title">Build smarter, not harder</h2>
+          <p class="section-subtitle">
+            Dream App gives you the simplicity of no-code with none of the
+            limitations. Compare how your workflow transforms when you choose
+            the right tool.
+          </p>
+        </div>
+
+        <div class="comparison-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Dream App</th>
+                <th>No-Code Platforms</th>
+                <th>Learning to Code</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Setup time</td>
+                <td><span class="check">✓</span> 5 minutes</td>
+                <td><span class="check">✓</span> 5 minutes</td>
+                <td><span class="cross">✗</span> Months to learn</td>
+              </tr>
+              <tr>
+                <td>Works for simple ideas</td>
+                <td><span class="check">✓</span></td>
+                <td><span class="check">✓</span></td>
+                <td><span class="check">✓</span> Eventually</td>
+              </tr>
+              <tr>
+                <td>Handles complexity</td>
+                <td><span class="check">✓</span> Gets better over time</td>
+                <td><span class="cross">✗</span> Breaks when complex</td>
+                <td><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>You own everything</td>
+                <td><span class="check">✓</span></td>
+                <td><span class="cross">✗</span> Locked in</td>
+                <td><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>Can build anything</td>
+                <td><span class="check">✓</span></td>
+                <td><span class="cross">✗</span> Template limits</td>
+                <td><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>AI helps you build</td>
+                <td><span class="check">✓</span> Personalized</td>
+                <td><span class="check">✓</span> Generic</td>
+                <td><span class="cross">✗</span> On your own</td>
+              </tr>
+              <tr>
+                <td>Easy for beginners</td>
+                <td><span class="check">✓</span></td>
+                <td><span class="check">✓</span></td>
+                <td><span class="cross">✗</span></td>
+              </tr>
+              <tr>
+                <td>Coding knowledge</td>
+                <td><span class="check">✓</span> None needed</td>
+                <td><span class="check">✓</span> None needed</td>
+                <td><span class="cross">✗</span> Required</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="social-proof">
+      <div class="container">
+        <div class="testimonial">
+          <p class="testimonial-quote">
+            I watched my girlfriend, who has zero coding experience ship a
+            working app in 2 days. She just talked to the AI like a person and
+            it built everything. That's when I realized this needs to be
+            available to everyone.
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-info">
+              <div class="testimonial-name">Hassan Bazzi</div>
+              <div class="testimonial-role">Creator of Dream App</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Frequently asked questions</h2>
+        </div>
+
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Do I need to know how to code?</span>
+              <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+              Not at all. Dream App is designed for complete beginners. You
+              describe what you want in plain English, and the AI builds it for
+              you. You'll learn as you go, but no prior experience is required.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>What's included in the installation?</span>
+              <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+              Everything you need: the AI editor, tools to make your app work, a
+              place to store data, user login features, and your app goes live
+              on the internet. All installed and set up automatically.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Is it really free?</span>
+              <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+              Yes! Dream App is completely free. All the services it uses have
+              generous free tiers that are perfect for getting started. You can
+              build and launch your app without spending anything.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Does this work on Windows?</span>
+              <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+              Right now it's Mac only, but Windows and Linux support are coming
+              soon! If you're on Windows, hang tight—we're working on making it
+              just as easy for you.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Can I use this to build a real business?</span>
+              <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+              Absolutely. This isn't a toy or demo. Your app is built with the
+              same professional tools that real startups and companies use. It
+              can handle real users, real payments, and real growth. Many
+              successful companies run on this exact setup.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>Do I own everything I build?</span>
+              <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+              Yes, 100%. Everything is saved under your account. Your app, your
+              data, your users. You can modify it, grow it, or even sell it. No
+              lock-in, no restrictions. It's completely yours.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>How long does setup take?</span>
+              <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+              About 5 minutes total. Most of that is just waiting for things to
+              download and set up automatically. Then you're ready to build.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>What if something goes wrong?</span>
+              <span class="faq-icon">▼</span>
+            </button>
+            <div class="faq-answer">
+              The installer tries to explain what's happening in plain English
+              and will tell you exactly what went wrong. If you get stuck, open
+              an issue on Github. It's like the social media tool for coders.
+              This installer will create an account for you! You can also always
+              hit me up on Twitter.
+              <a href="https://x.com/habazzi">https://x.com/habazzi</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="final-cta">
+      <div class="container-narrow">
+        <h2>Ready to build?</h2>
+        <p>
+          If you're looking to turn ideas into apps fast, Dream App is here for
+          you.
+        </p>
+        <a href="#install" class="btn btn-primary">
+          Get Dream App - it's Free
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <p>
+          Built with ❤️ by
+          <a href="https://github.com/hassanbazzi">Hassan Bazzi</a> •
+          <a href="https://github.com/hassanbazzi/dreamapp">Open Source</a> •
+          <a href="https://github.com/hassanbazzi/dreamapp/blob/main/LICENSE"
+            >MIT License</a
+          >
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      // Dark Mode Toggle
+      function toggleDarkMode() {
+        const body = document.body
+        const icon = document.getElementById("dark-mode-icon")
+        const isDark = body.classList.contains("dark-mode")
+
+        if (isDark) {
+          // Switch to light mode
+          body.classList.remove("dark-mode")
+          icon.textContent = "☀️"
+          localStorage.setItem("darkMode", "false")
+        } else {
+          // Switch to dark mode
+          body.classList.add("dark-mode")
+          icon.textContent = "🌙"
+          localStorage.setItem("darkMode", "true")
+        }
+      }
+
+      // Check for saved dark mode preference on page load
+      window.addEventListener("DOMContentLoaded", () => {
+        const htmlElement = document.documentElement
+        const body = document.body
+        const icon = document.getElementById("dark-mode-icon")
+
+        // Check if dark mode was initialized before page render
+        if (htmlElement.classList.contains("dark-mode-init")) {
+          body.classList.add("dark-mode")
+          icon.textContent = "🌙"
+          // Remove init class and re-enable transitions
+          htmlElement.classList.remove("dark-mode-init")
+        }
+      })
+
+      // Copy install command
+      function copyInstallCommand() {
+        const command =
+          "curl -fsSL https://raw.githubusercontent.com/hassanbazzi/dreamapp/main/install.sh | bash"
+        navigator.clipboard.writeText(command).then(() => {
+          const btn = document.querySelector(".copy-btn")
+          const originalText = btn.textContent
+          btn.textContent = "Copied!"
+          btn.classList.add("copied")
+          setTimeout(() => {
+            btn.textContent = originalText
+            btn.classList.remove("copied")
+          }, 2000)
+        })
+      }
+
+      // FAQ toggle
+      function toggleFaq(button) {
+        const item = button.parentElement
+        const wasActive = item.classList.contains("active")
+
+        // Close all items
+        document.querySelectorAll(".faq-item").forEach((faq) => {
+          faq.classList.remove("active")
+        })
+
+        // Open clicked item if it wasn't active
+        if (!wasActive) {
+          item.classList.add("active")
+        }
+      }
+
+      // Smooth scroll for anchor links with header offset
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault()
+          const target = document.querySelector(this.getAttribute("href"))
+          if (target) {
+            const header = document.querySelector("header")
+            const headerHeight = header ? header.offsetHeight : 0
+            const targetPosition =
+              target.getBoundingClientRect().top + window.pageYOffset
+            const offsetPosition = targetPosition - headerHeight - 20 // Extra 20px breathing room
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: "smooth",
+            })
+          }
+        })
+      })
+    </script>
+  </body>
 </html>
-
