@@ -287,46 +287,7 @@ else
 fi
 
 # ============================================
-# 6. CONNECT GITHUB ACCOUNT
-# ============================================
-print_header "Connecting to GitHub"
-
-echo ""
-echo -e "${VIBE_CYAN}What is GitHub?${NC}"
-echo "  GitHub is where the code that runs your app lives."
-echo "  Think of it like Google Drive, but for code."
-echo "  It keeps your app safe and tracks all your changes."
-echo ""
-
-# Check if already authenticated
-if ! gh auth status &>/dev/null; then
-    print_step "Signing in to GitHub..."
-    echo -e "${VIBE_YELLOW}  (A browser window will open)${NC}"
-    gh auth login
-else
-    print_success "Already signed in to GitHub"
-fi
-
-# Setup SSH if not exists
-if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
-    echo ""
-    read -p "Enter your email: " USER_EMAIL < /dev/tty
-    print_step "Setting up secure connection..."
-    ssh-keygen -t ed25519 -C "$USER_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "" >/dev/null 2>&1
-    eval "$(ssh-agent -s)" >/dev/null 2>&1
-    ssh-add "$HOME/.ssh/id_ed25519" 2>/dev/null
-    
-    # Add to GitHub
-    gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key" 2>/dev/null
-    print_success "Secure connection set up"
-else
-    print_success "Already connected securely"
-fi
-
-print_success "GitHub ready!"
-
-# ============================================
-# 7. CREATE PROJECT
+# 6. CREATE PROJECT DIRECTORY
 # ============================================
 print_header "Creating Your Project"
 
@@ -337,23 +298,33 @@ echo ""
 echo -e "  ${VIBE_YELLOW}Examples: My Cool App, Todo List, Recipe Book${NC}"
 echo ""
 
-# Keep asking until we get a valid non-empty name
+# Keep asking until we get a valid unique name
 while true; do
     read -p "  What's your app called? " APP_TITLE < /dev/tty
     
     # Remove leading/trailing whitespace
     APP_TITLE=$(echo "$APP_TITLE" | xargs)
     
-    if [ -n "$APP_TITLE" ]; then
-        break
+    if [ -z "$APP_TITLE" ]; then
+        echo -e "${VIBE_RED}✗ Please enter a name for your app${NC}"
+        echo ""
+        continue
     fi
     
-    echo -e "${VIBE_RED}✗ Please enter a name for your app${NC}"
-    echo ""
+    # Create slug from title (lowercase, spaces to dashes, remove special chars)
+    APP_SLUG=$(echo "$APP_TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
+    
+    # Check if directory already exists
+    if [ -d "$APP_SLUG" ]; then
+        echo -e "${VIBE_RED}✗ A folder named '$APP_SLUG' already exists${NC}"
+        echo -e "${VIBE_CYAN}  Please choose a different name${NC}"
+        echo ""
+        continue
+    fi
+    
+    # Valid and unique name!
+    break
 done
-
-# Create slug from title (lowercase, spaces to dashes, remove special chars)
-APP_SLUG=$(echo "$APP_TITLE" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | sed 's/[^a-z0-9-]//g')
 
 echo ""
 print_step "Setting up: ${APP_TITLE}"
@@ -371,32 +342,130 @@ mkdir -p "$APP_SLUG"
 # Copy template contents to new project
 cp -r /tmp/dreamapp-temp/template/. "$APP_SLUG/" 2>/dev/null
 
-# Clean up
+# Clean up temp directory
 rm -rf /tmp/dreamapp-temp
 
+# CD into project directory - all subsequent steps happen here
 cd "$APP_SLUG"
 
-print_success "Template ready"
+print_success "Project directory created: $APP_SLUG"
 
 # Replace placeholder title in template files
 print_step "Personalizing your app..."
 # Update package.json name
 sed -i '' "s/\"name\": \"dreamapp\"/\"name\": \"$APP_SLUG\"/" package.json 2>/dev/null || true
-# Update page title (we'll add this to template later)
+# Update page title
 find . -name "*.tsx" -o -name "*.ts" -type f -exec sed -i '' "s/Dream App/$APP_TITLE/g" {} + 2>/dev/null || true
 
-print_success "Personalized with your app name"
+print_success "Template ready and personalized"
 
-# Initialize git
-print_step "Saving to GitHub..."
+# Initialize git repository
+print_step "Initializing git repository..."
 git init >/dev/null 2>&1
 git add . >/dev/null 2>&1
 git commit -m "Initial commit: $APP_TITLE" >/dev/null 2>&1
+print_success "Git repository initialized"
 
-# Create GitHub repo
-gh repo create "$APP_SLUG" --private --source=. --remote=origin --push >/dev/null 2>&1
+# ============================================
+# 7. CONNECT GITHUB ACCOUNT
+# ============================================
+print_header "Connecting to GitHub"
 
-print_success "Saved to GitHub!"
+echo ""
+echo -e "${VIBE_CYAN}What is GitHub?${NC}"
+echo "  GitHub is where the code that runs your app lives."
+echo "  Think of it like Google Drive, but for code."
+echo "  It keeps your app safe and tracks all your changes."
+echo ""
+
+# Check if already authenticated
+if ! gh auth status &>/dev/null; then
+    print_step "Signing in to GitHub..."
+    echo -e "${VIBE_YELLOW}  (A browser window will open)${NC}"
+    echo ""
+    if gh auth login; then
+        print_success "Signed in to GitHub"
+    else
+        print_error "Failed to sign in to GitHub"
+        echo ""
+        echo -e "${VIBE_CYAN}You can complete this later by running: gh auth login${NC}"
+        exit 1
+    fi
+else
+    print_success "Already signed in to GitHub"
+fi
+
+# Setup SSH if not properly configured
+print_step "Checking SSH connection to GitHub..."
+
+# Test if SSH to GitHub works
+if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+    print_success "SSH connection verified"
+else
+    print_step "Setting up SSH key for GitHub..."
+    
+    # Get user's email (try from git config first)
+    USER_EMAIL=$(git config --global user.email 2>/dev/null)
+    
+    if [ -z "$USER_EMAIL" ]; then
+        echo ""
+        echo -e "${VIBE_CYAN}We need your email to set up GitHub${NC}"
+        read -p "Enter your email: " USER_EMAIL < /dev/tty
+        
+        # Set git config for future use
+        if [ -n "$USER_EMAIL" ]; then
+            git config --global user.email "$USER_EMAIL" 2>/dev/null || true
+            # Also set a default name if not set
+            if [ -z "$(git config --global user.name 2>/dev/null)" ]; then
+                git config --global user.name "$(whoami)" 2>/dev/null || true
+            fi
+        fi
+    fi
+    
+    # Generate SSH key if it doesn't exist
+    if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
+        ssh-keygen -t ed25519 -C "$USER_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "" >/dev/null 2>&1
+    fi
+    
+    # Start ssh-agent and add key
+    eval "$(ssh-agent -s)" >/dev/null 2>&1
+    ssh-add "$HOME/.ssh/id_ed25519" >/dev/null 2>&1
+    
+    # Add key to GitHub
+    if gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key" 2>&1; then
+        print_success "SSH key added to GitHub"
+        
+        # Verify it works now
+        sleep 2  # Give GitHub a moment to register the key
+        if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+            print_success "SSH connection verified"
+        else
+            print_warning "SSH key added but connection test failed"
+            echo -e "${VIBE_CYAN}This might work anyway, continuing...${NC}"
+        fi
+    else
+        print_warning "Could not add SSH key automatically"
+        echo ""
+        echo -e "${VIBE_CYAN}You can add it manually at: https://github.com/settings/keys${NC}"
+        echo -e "${VIBE_CYAN}Your public key is at: $HOME/.ssh/id_ed25519.pub${NC}"
+        echo ""
+        read -p "Press Enter once you've added the key..." < /dev/tty
+    fi
+fi
+
+print_success "GitHub ready!"
+
+# Push project to GitHub
+print_step "Saving to GitHub..."
+if gh repo create "$APP_SLUG" --private --source=. --remote=origin --push 2>&1 | grep -v "^$"; then
+    print_success "Saved to GitHub!"
+else
+    print_warning "GitHub push had issues"
+    echo ""
+    echo -e "${VIBE_CYAN}Your project is created locally, you can push it later with:${NC}"
+    echo -e "${VIBE_CYAN}  cd $APP_SLUG && git push -u origin main${NC}"
+    echo ""
+fi
 
 # ============================================
 # 8. INSTALL DEPENDENCIES
