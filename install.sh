@@ -408,21 +408,8 @@ else
     print_success "Already signed in to GitHub"
     
     # Ensure we have the necessary scope for SSH key management
-    print_step "Verifying GitHub permissions..."
-    set +e
-    gh auth refresh -h github.com -s admin:public_key >/dev/null 2>&1
-    REFRESH_EXIT=$?
-    set -e
-    
-    if [ $REFRESH_EXIT -eq 0 ]; then
-        print_success "GitHub permissions updated"
-    else
-        print_warning "Could not update GitHub permissions automatically"
-        echo -e "${VIBE_CYAN}A browser window will open to grant additional permissions${NC}"
-        echo ""
-        read -p "Press Enter to continue..." < /dev/tty
-        gh auth refresh -h github.com -s admin:public_key
-    fi
+    # We'll check this lazily when we actually need it (when adding SSH key)
+    # to avoid hanging on VM environments where browser auth might not work
 fi
 
 # Setup SSH if not properly configured
@@ -500,22 +487,33 @@ else
     
     # If we got a permission error, try refreshing the token
     if [ $ADD_KEY_EXIT -ne 0 ] && echo "$ADD_KEY_OUTPUT" | grep -qi "admin:public_key"; then
-        print_step "Requesting additional GitHub permissions..."
-        echo -e "${VIBE_CYAN}A browser window will open to grant SSH key permissions${NC}"
         echo ""
+        print_warning "GitHub needs additional permissions to add SSH keys"
+        echo ""
+        echo -e "${VIBE_CYAN}What's happening:${NC}"
+        echo "  GitHub CLI needs permission to manage your SSH keys."
+        echo "  A browser window will open for you to approve this."
+        echo ""
+        read -p "Press Enter when ready to continue..." < /dev/tty
+        echo ""
+        print_step "Opening browser for authorization..."
         
         set +e
-        gh auth refresh -h github.com -s admin:public_key
+        gh auth refresh -h github.com -s admin:public_key < /dev/tty
         REFRESH_EXIT=$?
         set -e
         
         if [ $REFRESH_EXIT -eq 0 ]; then
-            print_success "Permissions granted, retrying..."
+            echo ""
+            print_success "Permissions granted!"
+            print_step "Retrying SSH key upload..."
             # Try adding the key again
             set +e
             ADD_KEY_OUTPUT=$(gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key" 2>&1)
             ADD_KEY_EXIT=$?
             set -e
+        else
+            print_warning "Permission request failed or was cancelled"
         fi
     fi
     
