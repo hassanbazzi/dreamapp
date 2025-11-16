@@ -421,12 +421,17 @@ if ! grep -q "github.com" "$HOME/.ssh/known_hosts" 2>/dev/null; then
     ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
 fi
 
-# Test if SSH to GitHub works
+# Test if SSH to GitHub works (with timeout)
 set +e
-SSH_CHECK=$(ssh -T git@github.com 2>&1)
+SSH_CHECK=$(timeout 10 ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=accept-new -T git@github.com 2>&1)
+SSH_EXIT=$?
 set -e
 
-if echo "$SSH_CHECK" | grep -q "successfully authenticated"; then
+if [ $SSH_EXIT -eq 124 ]; then
+    # Timeout occurred
+    print_warning "SSH connection timed out, setting up SSH key..."
+    print_step "Setting up SSH key for GitHub..."
+elif echo "$SSH_CHECK" | grep -q "successfully authenticated"; then
     print_success "SSH connection verified"
 else
     print_step "Setting up SSH key for GitHub..."
