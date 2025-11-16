@@ -532,39 +532,61 @@ else
         # Verify it works now
         sleep 2  # Give GitHub a moment to register the key
         set +e
-        SSH_TEST=$(ssh -T git@github.com 2>&1)
+        SSH_TEST=$(timeout 10 ssh -o ConnectTimeout=10 -T git@github.com 2>&1)
+        SSH_TEST_EXIT=$?
         set -e
         
-        if echo "$SSH_TEST" | grep -q "successfully authenticated"; then
+        # Check if successfully authenticated (grep returns 0 if found)
+        set +e
+        echo "$SSH_TEST" | grep -q "successfully authenticated"
+        GREP_EXIT=$?
+        set -e
+        
+        if [ $GREP_EXIT -eq 0 ]; then
             print_success "SSH connection verified"
         else
             print_warning "SSH key added but connection test failed"
             echo -e "${VIBE_CYAN}This might work anyway, continuing...${NC}"
         fi
-    elif echo "$ADD_KEY_OUTPUT" | grep -qi "already exists\|already been taken\|key is already in use"; then
-        # Key already exists in GitHub - that's fine!
-        print_success "SSH key already in GitHub"
-        
-        # Verify it works
+    else
+        # Check if key already exists
         set +e
-        SSH_TEST=$(ssh -T git@github.com 2>&1)
+        echo "$ADD_KEY_OUTPUT" | grep -qi "already exists\|already been taken\|key is already in use"
+        KEY_EXISTS=$?
         set -e
         
-        if echo "$SSH_TEST" | grep -q "successfully authenticated"; then
-            print_success "SSH connection verified"
+        if [ $KEY_EXISTS -eq 0 ]; then
+            # Key already exists in GitHub - that's fine!
+            print_success "SSH key already in GitHub"
+            
+            # Verify it works
+            set +e
+            SSH_TEST=$(timeout 10 ssh -o ConnectTimeout=10 -T git@github.com 2>&1)
+            SSH_TEST_EXIT=$?
+            set -e
+            
+            # Check if successfully authenticated (grep returns 0 if found)
+            set +e
+            echo "$SSH_TEST" | grep -q "successfully authenticated"
+            GREP_EXIT=$?
+            set -e
+            
+            if [ $GREP_EXIT -eq 0 ]; then
+                print_success "SSH connection verified"
+            else
+                print_warning "SSH key exists but connection test failed"
+                echo -e "${VIBE_CYAN}Trying to continue anyway...${NC}"
+            fi
         else
-            print_warning "SSH key exists but connection test failed"
-            echo -e "${VIBE_CYAN}Trying to continue anyway...${NC}"
+            print_warning "Could not add SSH key automatically"
+            echo ""
+            echo -e "${VIBE_YELLOW}Error: $ADD_KEY_OUTPUT${NC}"
+            echo ""
+            echo -e "${VIBE_CYAN}You can add it manually at: https://github.com/settings/keys${NC}"
+            echo -e "${VIBE_CYAN}Your public key is at: $HOME/.ssh/id_ed25519.pub${NC}"
+            echo ""
+            read -p "Press Enter once you've added the key..." < /dev/tty
         fi
-    else
-        print_warning "Could not add SSH key automatically"
-        echo ""
-        echo -e "${VIBE_YELLOW}Error: $ADD_KEY_OUTPUT${NC}"
-        echo ""
-        echo -e "${VIBE_CYAN}You can add it manually at: https://github.com/settings/keys${NC}"
-        echo -e "${VIBE_CYAN}Your public key is at: $HOME/.ssh/id_ed25519.pub${NC}"
-        echo ""
-        read -p "Press Enter once you've added the key..." < /dev/tty
     fi
 fi
 
