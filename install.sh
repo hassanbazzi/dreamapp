@@ -97,18 +97,47 @@ print_step "Checking for Homebrew..."
 
 if ! command -v brew &>/dev/null; then
     print_step "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 2>&1 | grep -v "^$" | head -20
+    echo ""
+    echo -e "${VIBE_YELLOW}  This will ask for your Mac password (admin access required)${NC}"
+    echo ""
     
-    # Add to PATH (for Apple Silicon Macs)
-    if [[ $(uname -m) == 'arm64' ]]; then
-        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-        eval "$(/opt/homebrew/bin/brew shellenv)"
+    # Run Homebrew installer (let it show full output for transparency)
+    if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" < /dev/tty; then
+        # Add to PATH (for Apple Silicon Macs)
+        if [[ $(uname -m) == 'arm64' ]]; then
+            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        else
+            echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+        
+        # Verify brew is now available
+        if command -v brew &>/dev/null; then
+            print_success "Homebrew installed"
+        else
+            print_error "Homebrew installation completed but command not found"
+            echo ""
+            echo -e "${VIBE_YELLOW}Please restart your terminal and run this script again.${NC}"
+            exit 1
+        fi
     else
-        echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
-        eval "$(/usr/local/bin/brew shellenv)"
+        echo ""
+        print_error "Homebrew installation failed"
+        echo ""
+        echo -e "${VIBE_CYAN}Common causes:${NC}"
+        echo "  • Your user account needs Administrator access"
+        echo "  • Ask the Mac owner to grant you admin rights"
+        echo ""
+        echo -e "${VIBE_CYAN}To check if you're an admin:${NC}"
+        echo "  1. Open System Settings"
+        echo "  2. Go to Users & Groups"
+        echo "  3. Make sure '$(whoami)' shows 'Admin' below the name"
+        echo ""
+        echo "After getting admin access, run this installer again."
+        echo ""
+        exit 1
     fi
-    
-    print_success "Homebrew installed"
 else
     print_success "Homebrew already installed"
 fi
