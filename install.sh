@@ -422,7 +422,11 @@ if ! grep -q "github.com" "$HOME/.ssh/known_hosts" 2>/dev/null; then
 fi
 
 # Test if SSH to GitHub works
-if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+set +e
+SSH_CHECK=$(ssh -T git@github.com 2>&1)
+set -e
+
+if echo "$SSH_CHECK" | grep -q "successfully authenticated"; then
     print_success "SSH connection verified"
 else
     print_step "Setting up SSH key for GitHub..."
@@ -522,7 +526,11 @@ else
         
         # Verify it works now
         sleep 2  # Give GitHub a moment to register the key
-        if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+        set +e
+        SSH_TEST=$(ssh -T git@github.com 2>&1)
+        set -e
+        
+        if echo "$SSH_TEST" | grep -q "successfully authenticated"; then
             print_success "SSH connection verified"
         else
             print_warning "SSH key added but connection test failed"
@@ -533,7 +541,11 @@ else
         print_success "SSH key already in GitHub"
         
         # Verify it works
-        if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+        set +e
+        SSH_TEST=$(ssh -T git@github.com 2>&1)
+        set -e
+        
+        if echo "$SSH_TEST" | grep -q "successfully authenticated"; then
             print_success "SSH connection verified"
         else
             print_warning "SSH key exists but connection test failed"
