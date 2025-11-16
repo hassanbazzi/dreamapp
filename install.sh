@@ -680,6 +680,10 @@ set send_human {.1 .3 1 .05 2}
 spawn vercel integration add supabase
 
 expect {
+    -re {link this resource to the current project} {
+        send "y\r"
+        exp_continue
+    }
     -re {What is the name of the resource} {
         send "$env(APP_SLUG)\r"
         # Wait for region prompt
