@@ -1,10 +1,33 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "headers": [
+    {
+      "source": "/install.sh",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        },
+        {
+          "key": "Pragma",
+          "value": "no-cache"
+        },
+        {
+          "key": "Expires",
+          "value": "0"
+        },
+        {
+          "key": "Content-Type",
+          "value": "text/x-shellscript"
+        }
+      ]
+    }
+  ],
   "redirects": [
     {
       "source": "/install",
-      "destination": "https://raw.githubusercontent.com/hassanbazzi/dreamapp/main/install.sh",
-      "permanent": true
+      "destination": "/install.sh",
+      "permanent": false
     }
   ]
 }

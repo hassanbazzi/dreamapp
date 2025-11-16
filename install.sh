@@ -59,6 +59,36 @@ echo ""
 read -p "Ready? Press Enter to start..." < /dev/tty
 
 # ============================================
+# 0. REQUEST ADMIN ACCESS UPFRONT
+# ============================================
+echo ""
+print_step "Requesting admin access..."
+echo -e "${VIBE_YELLOW}  This will ask for your Mac password once${NC}"
+echo ""
+
+# Request sudo access upfront and keep it alive
+if sudo -v; then
+    print_success "Admin access granted"
+    
+    # Keep sudo alive in background (updates timestamp every 60 seconds)
+    # This prevents password re-prompts during the installation
+    (while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null) &
+    SUDO_KEEPER_PID=$!
+    
+    # Cleanup function to kill the sudo keeper when script exits
+    trap "kill $SUDO_KEEPER_PID 2>/dev/null || true" EXIT
+else
+    print_error "Admin access required to install tools"
+    echo ""
+    echo -e "${VIBE_CYAN}This installer needs admin access to:${NC}"
+    echo "  • Install Homebrew (package manager)"
+    echo "  • Install development tools"
+    echo "  • Configure Cursor"
+    echo ""
+    exit 1
+fi
+
+# ============================================
 # 1. CHECK MACOS
 # ============================================
 print_header "Checking System"
@@ -97,24 +127,39 @@ print_step "Checking for Homebrew..."
 
 if ! command -v brew &>/dev/null; then
     print_step "Installing Homebrew..."
-    echo ""
-    echo -e "${VIBE_YELLOW}  This will ask for your Mac password (admin access required)${NC}"
-    echo ""
     
-    # Run Homebrew installer (let it show full output for transparency)
-    if /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" < /dev/tty; then
-        # Add to PATH (for Apple Silicon Macs)
+    # Run Homebrew installer (sudo already authorized at script start)
+    # Use NONINTERACTIVE=1 to skip prompts since we have sudo
+    if NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; then
+        print_step "Adding Homebrew to PATH..."
+        
+        # Determine Homebrew path based on architecture
         if [[ $(uname -m) == 'arm64' ]]; then
-            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-            eval "$(/opt/homebrew/bin/brew shellenv)"
+            BREW_PATH="/opt/homebrew"
         else
-            echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
-            eval "$(/usr/local/bin/brew shellenv)"
+            BREW_PATH="/usr/local"
         fi
+        
+        # Add to shell profile files (both zsh and bash)
+        BREW_INIT='eval "$('$BREW_PATH'/bin/brew shellenv)"'
+        
+        # Add to .zprofile if not already there
+        if ! grep -q "brew shellenv" ~/.zprofile 2>/dev/null; then
+            echo "$BREW_INIT" >> ~/.zprofile
+        fi
+        
+        # Add to .zshrc if not already there (for interactive shells)
+        if ! grep -q "brew shellenv" ~/.zshrc 2>/dev/null; then
+            echo "$BREW_INIT" >> ~/.zshrc
+        fi
+        
+        # Load into current shell session immediately
+        eval "$($BREW_PATH/bin/brew shellenv)"
+        export PATH="$BREW_PATH/bin:$PATH"
         
         # Verify brew is now available
         if command -v brew &>/dev/null; then
-            print_success "Homebrew installed"
+            print_success "Homebrew installed and added to PATH"
         else
             print_error "Homebrew installation completed but command not found"
             echo ""
@@ -150,8 +195,13 @@ print_header "Installing Development Tools"
 print_step "Installing git, node, pnpm, and GitHub CLI..."
 echo -e "${VIBE_YELLOW}  (This might take a few minutes - sit tight!)${NC}"
 
-# Install tools via Homebrew (suppress already installed warnings)
-brew install git node pnpm gh 2>&1 | grep -v "already installed" | grep -v "To reinstall" | grep -v "brew reinstall" | grep -E "^(Installing|Downloading|==>)" || true
+# Install tools via Homebrew (suppress output to keep it clean)
+brew install git node pnpm gh >/dev/null 2>&1 || {
+    # If install fails, show output for debugging
+    echo ""
+    print_warning "Some tools may already be installed, continuing..."
+    brew install git node pnpm gh 2>&1 | grep -E "(Error|Warning)" || true
+}
 
 print_success "Core tools installed"
 
