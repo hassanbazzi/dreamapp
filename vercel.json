@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "redirects": [
+    {
+      "source": "/install",
+      "destination": "https://raw.githubusercontent.com/hassanbazzi/dreamapp/main/install.sh",
+      "permanent": true
+    }
+  ]
+}
