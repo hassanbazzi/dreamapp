@@ -203,10 +203,32 @@ brew install git node pnpm gh >/dev/null 2>&1 || {
     brew install git node pnpm gh 2>&1 | grep -E "(Error|Warning)" || true
 }
 
+# Ensure newly installed tools are in PATH
+hash -r 2>/dev/null || true
+
+# Verify critical tools are available
+if ! command -v pnpm &>/dev/null; then
+    print_error "pnpm installation failed"
+    echo ""
+    echo -e "${VIBE_CYAN}Trying to fix...${NC}"
+    brew link pnpm 2>&1
+    hash -r 2>/dev/null || true
+    
+    if ! command -v pnpm &>/dev/null; then
+        print_error "Cannot find pnpm. Please restart terminal and run script again."
+        exit 1
+    fi
+fi
+
 print_success "Core tools installed"
 
 print_step "Installing Vercel CLI..."
-pnpm install -g vercel >/dev/null 2>&1
+if pnpm install -g vercel >/dev/null 2>&1; then
+    print_success "Vercel CLI installed"
+else
+    print_warning "Vercel CLI installation had issues, retrying with verbose output..."
+    pnpm install -g vercel
+fi
 
 print_success "All development tools ready!"
 
