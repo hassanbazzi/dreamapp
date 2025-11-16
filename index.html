@@ -1519,8 +1519,7 @@
 
       // Copy install command
       function copyInstallCommand() {
-        const command =
-          "curl -fsSL https://raw.githubusercontent.com/hassanbazzi/dreamapp/main/install.sh | bash"
+        const command = "curl -fsSL https://getdreamapp.com/install | bash"
         navigator.clipboard.writeText(command).then(() => {
           const btn = document.querySelector(".copy-btn")
           const originalText = btn.textContent
