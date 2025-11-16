@@ -424,31 +424,53 @@ else
     print_step "Setting up SSH key for GitHub..."
     
     # Get user's email (try from git config first)
-    USER_EMAIL=$(git config --global user.email 2>/dev/null)
+    USER_EMAIL=$(git config --global user.email 2>/dev/null || echo "")
     
     if [ -z "$USER_EMAIL" ]; then
         echo ""
         echo -e "${VIBE_CYAN}We need your email to set up GitHub${NC}"
         read -p "Enter your email: " USER_EMAIL < /dev/tty
+        echo ""
         
         # Set git config for future use
         if [ -n "$USER_EMAIL" ]; then
+            print_step "Configuring git..."
             git config --global user.email "$USER_EMAIL" 2>/dev/null || true
             # Also set a default name if not set
-            if [ -z "$(git config --global user.name 2>/dev/null)" ]; then
+            if [ -z "$(git config --global user.name 2>/dev/null || echo "")" ]; then
                 git config --global user.name "$(whoami)" 2>/dev/null || true
             fi
+            print_success "Git configured"
+        else
+            print_warning "No email provided, using default"
+            USER_EMAIL="user@example.com"
         fi
+    else
+        print_success "Using email from git config: $USER_EMAIL"
     fi
     
     # Generate SSH key if it doesn't exist
+    print_step "Generating SSH key..."
     if [ ! -f "$HOME/.ssh/id_ed25519" ]; then
-        ssh-keygen -t ed25519 -C "$USER_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "" >/dev/null 2>&1
+        mkdir -p "$HOME/.ssh"
+        if ssh-keygen -t ed25519 -C "$USER_EMAIL" -f "$HOME/.ssh/id_ed25519" -N "" >/dev/null 2>&1; then
+            print_success "SSH key generated"
+        else
+            print_error "Failed to generate SSH key"
+            exit 1
+        fi
+    else
+        print_success "SSH key already exists"
     fi
     
     # Start ssh-agent and add key
+    print_step "Adding key to SSH agent..."
     eval "$(ssh-agent -s)" >/dev/null 2>&1
-    ssh-add "$HOME/.ssh/id_ed25519" >/dev/null 2>&1
+    if ssh-add "$HOME/.ssh/id_ed25519" >/dev/null 2>&1; then
+        print_success "Key added to SSH agent"
+    else
+        print_warning "Could not add key to SSH agent, continuing..."
+    fi
     
     # Add key to GitHub
     print_step "Adding SSH key to GitHub..."
