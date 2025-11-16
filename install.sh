@@ -266,6 +266,19 @@ fi
 
 print_success "All development tools ready!"
 
+# Reload shell environment to pick up all new PATH changes
+print_step "Refreshing shell environment..."
+# Source all the config files we've been updating
+if [ -f "$HOME/.zshrc" ]; then
+    source "$HOME/.zshrc" 2>/dev/null || true
+fi
+if [ -f "$HOME/.zprofile" ]; then
+    source "$HOME/.zprofile" 2>/dev/null || true
+fi
+# Ensure PATH updates are applied
+hash -r 2>/dev/null || true
+print_success "Environment refreshed"
+
 # ============================================
 # 5. INSTALL CURSOR
 # ============================================
@@ -397,6 +410,12 @@ fi
 
 # Setup SSH if not properly configured
 print_step "Checking SSH connection to GitHub..."
+
+# Add GitHub to known_hosts if not already there (avoids interactive prompt)
+if ! grep -q "github.com" "$HOME/.ssh/known_hosts" 2>/dev/null; then
+    mkdir -p "$HOME/.ssh"
+    ssh-keyscan -t ed25519 github.com >> "$HOME/.ssh/known_hosts" 2>/dev/null
+fi
 
 # Test if SSH to GitHub works
 if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
