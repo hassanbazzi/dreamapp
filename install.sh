@@ -641,7 +641,8 @@ print_step "Connecting to Vercel..."
 echo -e "${VIBE_YELLOW}  (A browser window will open)${NC}"
 
 # This will prompt for login if needed and create the project
-vercel link --yes 2>&1 | grep -E "Linked to|Success" || true
+VERCEL_LINK_OUTPUT=$(vercel link --yes 2>&1)
+echo "$VERCEL_LINK_OUTPUT" | grep -E "Linked to|Success" || true
 
 print_success "Connected to Vercel!"
 
@@ -666,22 +667,30 @@ echo -e "${VIBE_YELLOW}  (Setting up automatically - this may take a minute)${NC
 # First, check if Supabase terms need to be accepted
 print_step "Checking Supabase integration status..."
 
-# Get the Vercel team/user slug
-set +e
-VERCEL_WHOAMI_OUTPUT=$(vercel whoami 2>&1)
-set -e
-
-# Extract the username/team slug (it's after the '>' character)
-# Format is: "Vercel CLI X.Y.Z" then "> username" or "> Team Name (team-slug)"
-VERCEL_TEAM=$(echo "$VERCEL_WHOAMI_OUTPUT" | grep "^> " | sed 's/^> //' | tr -d '\r' | head -1)
-
-# If the output contains parentheses (team), extract the slug from inside them
-if echo "$VERCEL_TEAM" | grep -q "("; then
-    VERCEL_TEAM=$(echo "$VERCEL_TEAM" | grep -oE "\([^)]+\)" | sed 's/[()]//g')
+# Get the Vercel team/user slug from the project that was just linked
+# Check .vercel/project.json which is created by vercel link
+if [ -f ".vercel/project.json" ]; then
+    # Extract orgId from project.json - this is the team slug
+    VERCEL_TEAM=$(cat .vercel/project.json | grep -o '"orgId": *"[^"]*"' | cut -d'"' -f4)
 fi
 
-# Trim any whitespace
-VERCEL_TEAM=$(echo "$VERCEL_TEAM" | xargs)
+# Fallback to whoami if project.json doesn't exist or parsing failed
+if [ -z "$VERCEL_TEAM" ]; then
+    set +e
+    VERCEL_WHOAMI_OUTPUT=$(vercel whoami 2>&1)
+    set -e
+    
+    # Extract the username/team slug (it's after the '>' character)
+    VERCEL_TEAM=$(echo "$VERCEL_WHOAMI_OUTPUT" | grep "^> " | sed 's/^> //' | tr -d '\r' | head -1)
+    
+    # If the output contains parentheses (team), extract the slug from inside them
+    if echo "$VERCEL_TEAM" | grep -q "("; then
+        VERCEL_TEAM=$(echo "$VERCEL_TEAM" | grep -oE "\([^)]+\)" | sed 's/[()]//g')
+    fi
+    
+    # Trim any whitespace
+    VERCEL_TEAM=$(echo "$VERCEL_TEAM" | xargs)
+fi
 
 if [ -z "$VERCEL_TEAM" ]; then
     print_error "Could not determine Vercel team/user"
