@@ -474,8 +474,12 @@ else
     
     # Add key to GitHub
     print_step "Adding SSH key to GitHub..."
+    
+    # Temporarily disable exit-on-error for this command
+    set +e
     ADD_KEY_OUTPUT=$(gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key" 2>&1)
     ADD_KEY_EXIT=$?
+    set -e
     
     if [ $ADD_KEY_EXIT -eq 0 ]; then
         print_success "SSH key added to GitHub"
@@ -515,10 +519,19 @@ print_success "GitHub ready!"
 
 # Push project to GitHub
 print_step "Saving to GitHub..."
-if gh repo create "$APP_SLUG" --private --source=. --remote=origin --push 2>&1 | grep -v "^$"; then
+
+# Temporarily disable exit-on-error
+set +e
+REPO_OUTPUT=$(gh repo create "$APP_SLUG" --private --source=. --remote=origin --push 2>&1)
+REPO_EXIT=$?
+set -e
+
+if [ $REPO_EXIT -eq 0 ]; then
     print_success "Saved to GitHub!"
 else
     print_warning "GitHub push had issues"
+    echo ""
+    echo -e "${VIBE_YELLOW}Error: $REPO_OUTPUT${NC}"
     echo ""
     echo -e "${VIBE_CYAN}Your project is created locally, you can push it later with:${NC}"
     echo -e "${VIBE_CYAN}  cd $APP_SLUG && git push -u origin main${NC}"
