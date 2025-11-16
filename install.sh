@@ -842,6 +842,15 @@ print_success "Cursor is opening with your project!"
 
 echo ""
 echo -e "${VIBE_BOLD}${VIBE_CYAN}╔═══════════════════════════════════════════╗${NC}"
+echo -e "${VIBE_BOLD}${VIBE_CYAN}║${NC}          YOUR PROJECT LOCATION           ${VIBE_BOLD}${VIBE_CYAN}║${NC}"
+echo -e "${VIBE_BOLD}${VIBE_CYAN}╚═══════════════════════════════════════════╝${NC}"
+echo ""
+echo -e "  ${VIBE_GREEN}📁 Project folder:${NC} ${VIBE_BOLD}$APP_SLUG${NC}"
+echo ""
+echo -e "  ${VIBE_CYAN}To work on your app in the terminal, run:${NC}"
+echo -e "  ${VIBE_BOLD}cd $APP_SLUG${NC}"
+echo ""
+echo -e "${VIBE_BOLD}${VIBE_CYAN}╔═══════════════════════════════════════════╗${NC}"
 echo -e "${VIBE_BOLD}${VIBE_CYAN}║${NC}          WHERE TO FIND YOUR APP          ${VIBE_BOLD}${VIBE_CYAN}║${NC}"
 echo -e "${VIBE_BOLD}${VIBE_CYAN}╚═══════════════════════════════════════════╝${NC}"
 echo ""
@@ -861,5 +870,15 @@ echo ""
 echo -e "  ${VIBE_CYAN}Just follow along and start building!${NC}"
 echo ""
 echo -e "${VIBE_YELLOW}Have fun building ${APP_TITLE}! 🎨✨${NC}"
+echo ""
+
+# Optionally open a new terminal window in the project directory
+echo -e "${VIBE_CYAN}💡 Tip: Opening a new terminal window in your project...${NC}"
+osascript <<EOF 2>/dev/null || true
+tell application "Terminal"
+    do script "cd \"$(pwd)\" && clear && echo '\\033[1;36m📁 You are now in your project directory: $APP_SLUG\\033[0m' && echo '' && echo 'Run \\033[1mpnpm dev\\033[0m to start your development server' && echo ''"
+    activate
+end tell
+EOF
 echo ""
 
