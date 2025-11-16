@@ -668,13 +668,27 @@ print_step "Checking Supabase integration status..."
 
 # Get the Vercel team/user slug
 set +e
-VERCEL_TEAM=$(vercel whoami 2>&1 | grep -oE "[a-zA-Z0-9_-]+" | head -1)
+VERCEL_WHOAMI_OUTPUT=$(vercel whoami 2>&1)
 set -e
+
+# Extract the username/team slug (it's after the '>' character)
+# Format is: "Vercel CLI X.Y.Z" then "> username" or "> Team Name (team-slug)"
+VERCEL_TEAM=$(echo "$VERCEL_WHOAMI_OUTPUT" | grep "^> " | sed 's/^> //' | tr -d '\r' | head -1)
+
+# If the output contains parentheses (team), extract the slug from inside them
+if echo "$VERCEL_TEAM" | grep -q "("; then
+    VERCEL_TEAM=$(echo "$VERCEL_TEAM" | grep -oE "\([^)]+\)" | sed 's/[()]//g')
+fi
+
+# Trim any whitespace
+VERCEL_TEAM=$(echo "$VERCEL_TEAM" | xargs)
 
 if [ -z "$VERCEL_TEAM" ]; then
     print_error "Could not determine Vercel team/user"
     echo ""
     echo -e "${VIBE_CYAN}Please ensure you're logged in to Vercel${NC}"
+    echo -e "${VIBE_YELLOW}Debug: vercel whoami output:${NC}"
+    echo "$VERCEL_WHOAMI_OUTPUT"
     exit 1
 fi
 
