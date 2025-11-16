@@ -451,7 +451,11 @@ else
     ssh-add "$HOME/.ssh/id_ed25519" >/dev/null 2>&1
     
     # Add key to GitHub
-    if gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key" 2>&1; then
+    print_step "Adding SSH key to GitHub..."
+    ADD_KEY_OUTPUT=$(gh ssh-key add "$HOME/.ssh/id_ed25519.pub" -t "Dream App Key" 2>&1)
+    ADD_KEY_EXIT=$?
+    
+    if [ $ADD_KEY_EXIT -eq 0 ]; then
         print_success "SSH key added to GitHub"
         
         # Verify it works now
@@ -462,8 +466,21 @@ else
             print_warning "SSH key added but connection test failed"
             echo -e "${VIBE_CYAN}This might work anyway, continuing...${NC}"
         fi
+    elif echo "$ADD_KEY_OUTPUT" | grep -qi "already exists\|already been taken\|key is already in use"; then
+        # Key already exists in GitHub - that's fine!
+        print_success "SSH key already in GitHub"
+        
+        # Verify it works
+        if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+            print_success "SSH connection verified"
+        else
+            print_warning "SSH key exists but connection test failed"
+            echo -e "${VIBE_CYAN}Trying to continue anyway...${NC}"
+        fi
     else
         print_warning "Could not add SSH key automatically"
+        echo ""
+        echo -e "${VIBE_YELLOW}Error: $ADD_KEY_OUTPUT${NC}"
         echo ""
         echo -e "${VIBE_CYAN}You can add it manually at: https://github.com/settings/keys${NC}"
         echo -e "${VIBE_CYAN}Your public key is at: $HOME/.ssh/id_ed25519.pub${NC}"
