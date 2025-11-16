@@ -222,12 +222,46 @@ fi
 
 print_success "Core tools installed"
 
+print_step "Configuring pnpm..."
+# Setup pnpm global bin directory
+if pnpm setup >/dev/null 2>&1; then
+    # Source the updated PATH from pnpm setup
+    if [[ -f "$HOME/.zshrc" ]]; then
+        # Extract and evaluate the PNPM_HOME setup from .zshrc
+        if grep -q "PNPM_HOME" "$HOME/.zshrc" 2>/dev/null; then
+            export PNPM_HOME="$HOME/Library/pnpm"
+            export PATH="$PNPM_HOME:$PATH"
+        fi
+    fi
+    print_success "pnpm configured"
+else
+    print_warning "pnpm setup had issues, setting up manually..."
+    # Manually configure PNPM_HOME
+    export PNPM_HOME="$HOME/Library/pnpm"
+    mkdir -p "$PNPM_HOME"
+    export PATH="$PNPM_HOME:$PATH"
+    
+    # Add to shell profiles if not already there
+    if ! grep -q "PNPM_HOME" ~/.zshrc 2>/dev/null; then
+        echo 'export PNPM_HOME="$HOME/Library/pnpm"' >> ~/.zshrc
+        echo 'export PATH="$PNPM_HOME:$PATH"' >> ~/.zshrc
+    fi
+    print_success "pnpm configured manually"
+fi
+
 print_step "Installing Vercel CLI..."
 if pnpm install -g vercel >/dev/null 2>&1; then
     print_success "Vercel CLI installed"
 else
     print_warning "Vercel CLI installation had issues, retrying with verbose output..."
-    pnpm install -g vercel
+    if pnpm install -g vercel; then
+        print_success "Vercel CLI installed"
+    else
+        print_error "Vercel CLI installation failed"
+        echo ""
+        echo -e "${VIBE_CYAN}You can install it later with: pnpm install -g vercel${NC}"
+        echo ""
+    fi
 fi
 
 print_success "All development tools ready!"
