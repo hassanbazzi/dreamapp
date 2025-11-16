@@ -663,6 +663,56 @@ echo ""
 print_step "Setting up your database and login system..."
 echo -e "${VIBE_YELLOW}  (Setting up automatically - this may take a minute)${NC}"
 
+# First, check if Supabase terms need to be accepted
+print_step "Checking Supabase integration status..."
+
+# Get the Vercel team/user slug
+set +e
+VERCEL_TEAM=$(vercel whoami 2>&1 | grep -oE "[a-zA-Z0-9_-]+" | head -1)
+set -e
+
+if [ -z "$VERCEL_TEAM" ]; then
+    print_error "Could not determine Vercel team/user"
+    echo ""
+    echo -e "${VIBE_CYAN}Please ensure you're logged in to Vercel${NC}"
+    exit 1
+fi
+
+# URL encode the team name (replace spaces, special chars)
+VERCEL_TEAM_ENCODED=$(echo "$VERCEL_TEAM" | sed 's/ /%20/g')
+
+# Construct the Supabase checkout URL
+SUPABASE_CHECKOUT_URL="https://vercel.com/${VERCEL_TEAM_ENCODED}/~/integrations/checkout/supabase?cancelUrl=%2F${VERCEL_TEAM_ENCODED}%2F%7E%2Fintegrations%2Fsupabase"
+
+echo ""
+echo -e "${VIBE_CYAN}Before we continue, we need to make sure Supabase terms are accepted.${NC}"
+echo ""
+echo -e "${VIBE_YELLOW}📋 ACTION REQUIRED:${NC}"
+echo "  1. A browser will open to the Supabase integration page"
+echo "  2. If prompted, accept the terms and conditions"
+echo "  3. You don't need to configure anything - just accept terms"
+echo "  4. Then come back here and press Enter"
+echo ""
+read -p "Press Enter to open the browser..." < /dev/tty
+
+# Open the checkout URL
+if command -v open &>/dev/null; then
+    open "$SUPABASE_CHECKOUT_URL"
+elif command -v xdg-open &>/dev/null; then
+    xdg-open "$SUPABASE_CHECKOUT_URL"
+fi
+
+echo ""
+echo -e "${VIBE_CYAN}✓ Browser opened${NC}"
+echo ""
+echo -e "${VIBE_YELLOW}⏳ Waiting for you to accept terms...${NC}"
+echo -e "${VIBE_CYAN}   Once you've accepted the terms (or if already accepted),${NC}"
+echo -e "${VIBE_CYAN}   press Enter here to continue the installation${NC}"
+echo ""
+read -p "Press Enter to continue..." < /dev/tty
+
+print_success "Ready to set up Supabase"
+
 # Install expect if not present (needed for automation)
 if ! command -v expect &> /dev/null; then
     brew install expect >/dev/null 2>&1
@@ -680,6 +730,12 @@ set send_human {.1 .3 1 .05 2}
 spawn vercel integration add supabase
 
 expect {
+    -re {Terms have not been accepted} {
+        # This should not happen since we handled it upfront, but just in case...
+        send "n\r"
+        send_user "\n\033\[1;31m✗ Terms were not accepted. Please run the installer again.\033\[0m\n"
+        exit 1
+    }
     -re {link this resource to the current project} {
         send "y\r"
         exp_continue
