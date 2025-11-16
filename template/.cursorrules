@@ -123,6 +123,7 @@ If a request is vague or you need to understand the user's vision better, sugges
 4. **Compose, don't duplicate** - Build complex features by combining smaller pieces
 
 **Example: Building a notes feature**
+
 ```
 ❌ DON'T: One giant app/(app)/notes/page.tsx with everything
 
@@ -378,6 +379,7 @@ git commit -m "Brief description of what was done"
 ```
 
 Don't commit after every single response, but DO commit when:
+
 - ✅ A feature is complete and tested
 - ✅ A bug is fixed and verified
 - ✅ You've reached a stable checkpoint

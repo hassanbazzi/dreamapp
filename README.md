@@ -44,7 +44,7 @@ This is designed for complete beginners who want to build apps with AI. No codin
 - A deployed app on Vercel (already live!)
 - Everything in one window - never leave Cursor
 
-**Time to first app:** ~15 minutes
+**Time to first app:** ~5 minutes
 
 ## For Developers
 
