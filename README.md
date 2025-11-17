@@ -6,6 +6,8 @@ A complete development environment setup that takes someone from a fresh Mac to 
 
 Visit: [getdreamapp.com](https://getdreamapp.com)
 
+<img width="1480" height="1480" alt="build" src="https://github.com/user-attachments/assets/7879e12f-42d4-4893-b718-be3422f5b43c" />
+
 ## What This Does
 
 One command installs:
